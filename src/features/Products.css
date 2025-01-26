@@ -1,0 +1,13 @@
+ 
+.products{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    column-gap: 60px;
+    row-gap: 40px;
+    margin: 0 auto;
+    margin: 30px 30px;
+  }
+  
+ 
+   
+  
