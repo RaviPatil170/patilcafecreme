@@ -7,11 +7,11 @@ import "./Header.css"
 const burgerImage ='/right side/burger.png';
 const pngwing2 ='/right side/buger2.png';
 const pngwing3 ='/right side/buger2.png';
-const pngwing4 ='/right side/Flying Burger PNG Image - 2084x2084.png.png';
+const pngwing4 ='/right side/Flying Burger PNG Image - 2084x2084.png';
 const pngwing5 ='/right side/pngwing.com (16).png'
 export default function Header() {
     //let toggle_image_address=;
-    const [toggle_image_address,setToggle_image_address]=useState('../public/right side/Flying Burger PNG Image - 2084x2084.png')
+    const [toggle_image_address,setToggle_image_address]=useState('/right side/Flying Burger PNG Image - 2084x2084.png')
     function toggleBurger(e,src,){
     console.log(src);
             setToggle_image_address(()=>src);
