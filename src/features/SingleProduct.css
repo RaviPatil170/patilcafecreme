@@ -36,6 +36,11 @@
     border: none;
     outline: none;
     padding: 10px;
+    transition: all 0.3s ease
+  }
+  .btn:hover{
+    background-color: rgba(227, 97, 110, 0.829);
+    transform: scale(1.05);
   }
   
   .image-container img {

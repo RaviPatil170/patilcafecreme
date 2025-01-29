@@ -8,7 +8,8 @@ import { addNewOrder,fetchOrderDetails } from '../store/productSlice';
 const Navbar = () => {
    const [isOpen,setIsOpen]=useState(false);
    const dispatch=useDispatch();
-  const orders = useSelector((state)=>state.product.ordersData);
+    const orders = useSelector((state)=>state.product.ordersData);
+  
  function handleCart(){
   console.log("opennn")
       setIsOpen(()=>!isOpen)
@@ -19,6 +20,7 @@ const Navbar = () => {
   function placeOrder(){
     if(orders.length==0)return;
     dispatch(fetchOrderDetails(orders));
+    //console.log("responseForAddedProduct",responseForAddedProduct);
   }
   function cancelOrder(){
     dispatch(addNewOrder([]));
@@ -35,7 +37,7 @@ const Navbar = () => {
           <Link to="/products">Order Food</Link>
         </li>
         <li>
-          <Link to="/products">About</Link>
+          <Link to="/addnewproducts">Add new Item</Link>
         </li>
         <li>
           <Link to="/contactus">Contact</Link>

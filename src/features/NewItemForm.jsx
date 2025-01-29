@@ -4,7 +4,9 @@ import { useDispatch,useSelector } from 'react-redux';
 import { addNewProduct } from '../store/productSlice';
 import { toast } from 'react-toastify';
 const NewItemForm = () => {
-    const dispatch=useDispatch();
+  const dispatch=useDispatch();
+ 
+  const responseForAddedProduct=useSelector((state)=>state.product.responseForAddedProduct);
   const [formData, setFormData] = useState({
     product_name: '',
     price: '',
@@ -20,25 +22,18 @@ const NewItemForm = () => {
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    // Here you would typically handle the form submission, 
-    // such as sending the data to a server or updating state.
-    
-  
-        //console.log('Item added successfully:', formData);
-        // Clear form after successful submission
       dispatch(addNewProduct(formData));
-    toast.success("new food item has been saved successfully");
-  
-    console.log('Form submitted:', formData); 
-    // Reset form after submission
-    setFormData({
-      product_name: '',
-      price: '',
-      ingredients: '',
-      product_description: '',
-      image_url:''
-    });
+      console.log(formData)
+      console.log("responseForAddedProduct",responseForAddedProduct);
+
+      toast.success("new food item has been saved successfully");
+      setFormData({
+        product_name: "",
+        price: "",
+        ingredients: "",
+        product_description: "",
+        image_url: "",
+      });
   };
 
   return (

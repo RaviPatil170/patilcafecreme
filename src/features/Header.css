@@ -1,0 +1,130 @@
+
+
+
+header{
+    width: 100%;
+    height: 100vh;
+    background-color: transparent;
+    animation: 1s ease-in-out;
+}
+.text{
+    position: relative;
+    top: 5rem;
+    left: 11rem;
+    letter-spacing: 1px;
+    animation: fadeInUp 1s ease-in-out;
+}
+.text p{
+    width: 40%;
+}
+.text h1{
+    font-weight: bold;
+    font-size: 4rem;
+    font-family: sans-serif;
+    margin-bottom: 10px;
+    animation: fadeInUp 1s ease-in-out;
+}
+.buttons-section .btn{
+    color: white;
+    border: 1px grey;
+    position: relative;
+    top: 3rem;
+    padding: 18px 24px;
+    border-radius: 6px;
+    letter-spacing: 1.5px;
+    font-family: sans-serif;
+    text-decoration: none;
+    transition: all 0.5s ease;
+    margin-right: 10px;
+    animation: fadeInUp 1s ease-in-out backwards;
+}
+.buttons-section .btn:hover{
+    background-color: #ff6b6b;
+    box-shadow: 0 0 10px 2px #ff6b6b;
+}
+.burger{
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    width: 90%;
+    padding: 20px;
+}
+.burger img{
+    width: 100px;
+    height: 100px;
+    margin-left: 20px;
+    object-fit: cover;
+    border: 2px solid #0000004b;
+    transition:transform 0.3s ease;
+    animation: fadeInUp 1s ease-in-out 2s backwards;
+    border-radius: 10px;
+
+}
+.burger img:hover{
+    transform: scale(1.1);
+    box-shadow: 0 0 30px rgba(207, 77, 77, 0.8)
+}
+.burger-toggle img{
+    position: absolute;
+    width: 38%;
+    height: 74%;
+    right: 35px;
+    top:7rem;
+    filter: drop-shadow(63px 90px 392px black);
+    animation: fadeInUp 1s ease-in-out 2.5s backwards;
+}
+
+.burger,.burger-toggle{
+    display: flex;
+}
+.burger-toggle img{
+    display: none;
+}
+.burger-toggle img.active{
+    display: block;
+}
+
+@keyframes fadeInUp {
+    from{
+        opacity: 0;
+        transform: translateY(50px);
+    }
+    to{
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+@keyframes slideInFromTop {
+    from{
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to{
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+@keyframes slideInFromBottom {
+    from{
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    to{
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes rotateIn {
+    from{
+        transform: rotate3d(0,0,1,-200deg);
+        opacity: 0;
+    }
+    to{
+        transform: none;
+        opacity: 1;
+    }
+    
+}

@@ -13,6 +13,7 @@ const initialState={
     loading:false,
     error:null,
     ordersPlaced:[],
+    responseForAddedProduct:null
 }
 
 const productSlice = createSlice({
@@ -26,7 +27,7 @@ const productSlice = createSlice({
             state.productData = action.payload;
         },
         addNewProduct:(state,action)=>{
-            state.productData=action.payload;
+            state.responseForAddedProduct=action.payload;
         },
         addNewOrder:(state,action)=>{
             state.ordersData=[...action.payload];
@@ -105,7 +106,7 @@ export function fetchProductData(state,action){
           console.error("Error fetching countries:", supabaseError);
           dispatch({type: 'product/fetchProductData', payload: []});
         } else {
-            const newData =data.map((el)=>{return {...el,quantity:0}})
+        const newData =data.map((el)=>{return {...el,quantity:""}})
           console.log("products fetched successfully:", data);
           dispatch({type: 'product/fetchProductData', payload: newData});
         }
@@ -125,10 +126,15 @@ export function addNewProduct(formData){
                 },
               }
             );
+            console.log(response,"-----");
+            dispatch({type: 'product/addNewProduct', payload: response.data});
+            toast.success("new food item has been saved successfully");
+            dispatch(fetchProductData());
         }catch(e){
             console.log(e,"error while sendind data");
+            toast.error("there is some error while saving the data");
+            dispatch({type: 'product/addNewProduct', payload: response.error});
         }
-        dispatch({type: 'product/addNewProduct', payload: []});
         
     }
 }
