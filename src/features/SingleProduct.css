@@ -1,14 +1,65 @@
 .product-item {
     display: flex;
     flex-direction: column;
-    flex-wrap: wrap;
-    align-items: center;
-    text-align: center; 
-    border: 1px solid #ccc;
-    border-radius: 10px;
+    width: 300px; /* Adjust as needed */
+    height: 500px;
+    border: 1px solid #ddd; /* Light gray border (optional) */
+    border-radius: 15px; /* Rounded corners (optional) */
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow (optional) */
+    background-color: hsl(0, 0%, 100%);/* Light background color (optional) */
+    background-color: #fff;
+    padding: 15px;
+    margin-bottom: 40px;
+    overflow: hidden;
+    transition: all 0.3s ease
+    
+  }
+  .product-item:hover{
+    transform: scale(1.05);
+  }
+  .product-info{
+    display: flex;
+    flex-direction: column;
     padding: 20px;
     gap: 10px;
-   
+  }
+  .product-info .name{
+    font-weight: bold;
+    font-family: sans-serif;
+    font-size: 16px;
+  }
+  .product-info .price{
+    font-size: 18px;
+    font-family: "Poppins";
+    font-weight: bold;
+    color: #15803d;
+  }
+  .product-info .price .ruppe-symbol{
+    font-size: 18px;
+    font-weight: bold;
+    font-family: "Poppins";
+
+  }
+  .product-name{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .product-description{
+    overflow: scroll;
+    width: 100%;
+    height: 80px;
+    color: #868e96;
+    font-weight: 100;
+
+  }
+  .show-more{
+    width: 40px;
+    height: 20px;
+    padding: 2px;
+    margin-left: 5px;
+    cursor: pointer;
   }
   .product-item:hover{
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
@@ -29,6 +80,11 @@
     border-radius: 5px;
     outline: none;
     font-size: 14px;
+    background-color: #15803d;
+    color: #fff;
+    width: 100%;
+    padding: 11px;
+    
     
   }
   .btn{
@@ -39,14 +95,25 @@
     transition: all 0.3s ease
   }
   .btn:hover{
-    background-color: rgba(227, 97, 110, 0.829);
+    background-color:#2f9e44;
     transform: scale(1.05);
+  }
+  .image-container{
+    width: 100%;
+    height: 300px;
   }
   
   .image-container img {
-    width: 100%; 
-    height: 200px;
-    object-fit: contain;
-    margin: 5px;
+    width: 100%;
+    height: 100%; /* Maintain aspect ratio */
+    border-radius: 10px; /* Slightly rounded corners for the image */
+    /* Prevents a small space below the image */
+    object-fit:cover; /* Ensures image covers the container */
   }
-  
+  .toast-add-item{
+  height: 20px; /* Or your desired height */
+  /* Other styles as needed */
+  display: flex; /* Often helpful for vertical alignment */
+  align-items: center; /* Vertically center content */
+    
+  }

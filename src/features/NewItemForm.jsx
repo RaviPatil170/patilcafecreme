@@ -23,10 +23,9 @@ const NewItemForm = () => {
 
   const handleSubmit = (e) => {
       dispatch(addNewProduct(formData));
-      console.log(formData)
-      console.log("responseForAddedProduct",responseForAddedProduct);
+      
 
-      toast.success("new food item has been saved successfully");
+      
       setFormData({
         product_name: "",
         price: "",

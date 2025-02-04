@@ -1,6 +1,7 @@
 .navbar {
     background-color: rgb(239, 79, 95);
     overflow: hidden;
+    
   }
   
   .nav-items{
@@ -9,6 +10,7 @@
     justify-content: flex-end;
     align-items: center;
     height: 60px;
+    margin-right: 20px !important;
     /* padding: 10px 20px; */
   }
   .navbar ul {
@@ -32,7 +34,7 @@
   .navbar a::before{
     content: "";
     position: absolute;
-    text-align: center;
+   
     width: 80%;
     height: 2px;
     bottom: 0;
@@ -89,9 +91,7 @@
     gap: 60px;
     padding: 10px;
   }
-  .place-order,.cancel-order{
-    
-  }
+ 
   .cart-icon {
     position: relative;
   }
@@ -100,7 +100,7 @@
     position: absolute;
     top: -5px;
     right: -3px;
-    background-color: green; 
+    background-color: #2b8a3e; 
     color: white;
     border-radius: 50%;
     width: 24px;
@@ -109,5 +109,9 @@
     justify-content: center;
     align-items: center;
     font-size: 14px;
+    border: 2px solid white;
+    box-sizing: border-box;
   }
+  
+
   

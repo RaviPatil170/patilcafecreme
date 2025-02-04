@@ -6,7 +6,7 @@ import React, { useState } from 'react';
 import "./Header.css"
 const burgerImage ='/right side/burger.png';
 const pngwing2 ='/right side/buger2.png';
-const pngwing3 ='/right side/buger2.png';
+const pngwing3 ='/right side/pngwing.com (12).png';
 const pngwing4 ='/right side/Flying Burger PNG Image - 2084x2084.png';
 const pngwing5 ='/right side/pngwing.com (16).png'
 export default function Header() {
