@@ -181,7 +181,7 @@ export function fetchOrderDetails(orders) {
     };
   }
 export function fetchProductData(state,action){
-    console.log(state,action);
+    //console.log(state,action);
     return async function(dispatch,getState){
         const { data, error: supabaseError } = await supabase.from("product_info").select("*");
         if (supabaseError) {
@@ -221,6 +221,7 @@ export function fetchProductData(state,action){
 //     }
 // }
 export function addNewProduct(formData) {
+    
     return async function (dispatch, getState) {
       try {
         const response = await axios.post(
@@ -233,7 +234,7 @@ export function addNewProduct(formData) {
             },
           }
         );
-  
+        debugger;
         console.log("Response from Supabase:", response.data); // Log the full response
   
         // Check for successful insertion (status code 201 is typical for POST)

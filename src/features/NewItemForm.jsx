@@ -12,6 +12,7 @@ const NewItemForm = () => {
     price: '',
     ingredients: '',
     product_description: '',
+    product_category:''
   });
 
   const handleChange = (e) => {
@@ -32,6 +33,7 @@ const NewItemForm = () => {
         ingredients: "",
         product_description: "",
         image_url: "",
+        product_category:""
       });
   };
 
@@ -81,6 +83,15 @@ const NewItemForm = () => {
           id="product_description" 
           name="product_description" 
           value={formData.product_description} 
+          onChange={handleChange} 
+        />
+      </div>
+      <div>
+        <label htmlFor="product_category">Product Category:</label>
+        <textarea 
+          id="product_category" 
+          name="product_category" 
+          value={formData.product_category} 
           onChange={handleChange} 
         />
       </div>

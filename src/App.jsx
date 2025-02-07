@@ -11,9 +11,19 @@ import ContactUs from "./pages/ContactUs";
 import PageNotFound from "./features/PageNotFound";
 import Cart from "./pages/Cart";
 
+import { useDispatch } from "react-redux";
+import { fetchProductData } from "./store/productSlice";
+import NewProductsPage from "./pages/NewProductsPage";
+
+
 
 function App() {
-  
+  const dispatch= useDispatch();
+    useEffect(() => {
+      dispatch(fetchProductData());
+      
+    }, []);
+   
 
   return (
     <>
@@ -25,6 +35,7 @@ function App() {
         <Route path="/products" element={<Product></Product>}></Route>
         <Route path="/addnewproducts" element={<AddNewProducts></AddNewProducts>}></Route>
         <Route path="/ordercart" element={<Cart></Cart>}></Route>
+        <Route path="/newordermenu" element={<NewProductsPage></NewProductsPage>}></Route>
         <Route path="*" element={<PageNotFound></PageNotFound>}></Route>
       </Routes>
       </BrowserRouter>

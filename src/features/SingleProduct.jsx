@@ -13,8 +13,6 @@ export default function SingleProduct({product}) {
     function addToOrders(e,product){
         console.log(product);
         const {product_id,quantity,product_name,price}=product;
-       
-        console.log(orders,"helloo");
         if(orders!==null && orders.find((el)=>el.product_id==product_id)){
             dispatch(addNewOrder([...orders.filter((el)=>el.product_id!==product_id),{product_id,quantity:1,product_name,price}]))
         }else{
@@ -31,7 +29,6 @@ export default function SingleProduct({product}) {
           // ... other global options
           className:"toast-add-item"
         });
-        console.log("order has been added");
     }
     return (
       <div>

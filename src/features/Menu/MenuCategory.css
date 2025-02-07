@@ -1,0 +1,8 @@
+.menu-container {
+    width: 100%; 
+    font-family: "Poppins",sans-serif;
+    border: none; 
+    padding: 30px 60px;
+    background-color: #f8f9fa;
+    box-sizing: border-box;
+  }

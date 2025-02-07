@@ -1,0 +1,177 @@
+/* Import Gilroy font files */
+@font-face {
+    font-family: 'Gilroy'; /* Give it a name to use in your CSS */
+    src: url('path/to/Gilroy-Regular.woff2') format('woff2'), /* Modern browsers */
+         url('path/to/Gilroy-Regular.woff') format('woff'), /* Older browsers */
+         url('path/to/Gilroy-Regular.ttf') format('truetype'); /* Even older browsers */
+    font-weight: normal; /* Define the font weight */
+    font-style: normal; /* Define the font style */
+    font-display: swap; /* Optional: Prevents FOIT/FOUT */
+  }
+  
+  @font-face { /* For other weights/styles (e.g., Bold) */
+    font-family: 'Gilroy';
+    src: url('path/to/Gilroy-Bold.woff2') format('woff2'),
+         url('path/to/Gilroy-Bold.woff') format('woff'),
+         url('path/to/Gilroy-Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+  }
+  
+  /* ... import other weights/styles as needed */
+  
+  /* Now use the font in your CSS */
+  
+
+/*  */
+  
+  .section {
+    margin-bottom: 10px;
+  }
+  
+  .section-header {
+    display: flex;
+    justify-content: space-between; /* Distribute title, count, arrow */
+    align-items: center;
+    cursor: pointer;
+    padding: 5px;
+    border-bottom: 1px solid #eee; /* Subtle separator */
+  }
+  .section-header-left{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-title {
+    font-weight: bold;
+  }
+  
+  .section-count {
+    color: #777;
+    font-size: 0.9em;
+  }
+  
+  .section-arrow {
+    transition: transform 0.2s ease;
+     /* Smooth rotation */
+     color: #000;
+  }
+  
+  .sction-arrow.open {
+    transform: rotate(180deg);/* Rotate on open */
+  }
+  
+  .section-content {
+    padding: 10px;
+  }
+  
+  .menu-item {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    
+    align-items: center;
+    padding-top: 20px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid #eee;
+    gap: 40px;
+  }
+  .menu-item .item-description{
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    
+  }
+  .menu-item .name-price{
+    display: flex;
+    flex-direction: column;
+    gap:3px;
+    font-size: 18px;
+    font-weight: bold;
+    
+
+  }
+  .name-price .item-price{
+    
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 19px;
+    letter-spacing: -0.3px;
+    color: rgba(2, 6, 12, 0.92);
+  }
+  .menu-item .item-summary{
+    font-family: Gilroy;
+    font-weight: 200;
+    font-size: 16px;
+    line-height: 19px;
+    letter-spacing: -0.3px;
+    color: rgba(2, 6, 12, 0.6);
+  }
+  .menu-item .item-rating{
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    color: rgb(17, 102, 73);
+    font-weight: 700;
+    font-size: 13px;
+    line-height: 16px;
+    letter-spacing: -0.1px;
+    font-family: Gilroy_Bold;
+    
+  }
+  .menu-item .item-rating svg{
+    width: 18px;
+    height: 18px;
+  }
+  .menu-item .item-rating path{
+   fill: rgb(17, 102, 73)
+  }
+  .item-right-section{
+    position: relative;
+  }
+  .menu-item .item-right-section img{
+    width: 150px;
+    height: 150px;
+    border-radius: 10px;
+  }
+  .item-right-section .button-add{
+    position: absolute;
+    left: 20px;
+    bottom: -12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 120px;
+    height: 40px;
+    background-color: #f8f9fa;
+    border: 1px solid rgb(222, 220, 220);
+    border-radius: 8px;
+    padding: 15px;
+   
+    
+    font-family: sans-serif;
+    font-weight: 800;
+    font-size: 18px;
+    line-height: 24px;
+    text-transform: uppercase;
+    color: rgb(27, 166, 114);
+    transition: box-shadow 0.3s ease;;
+  }
+  .item-right-section .button-add:hover{
+    cursor: pointer;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+    background-color: #f1f3f5;
+  }
+
+
+  .down-arrow,.up-arrow{
+    stroke: #000 !important;
+    width: 24px;
+    height: 24px;
+  }
+  .down-arrow:hover,.up-arrow:hover{
+    filter: brightness(1.5);
+    cursor: pointer;
+  }
