@@ -15,7 +15,9 @@ const initialState={
     error:null,
     ordersPlaced:[],
     orderError:[],
-    responseForAddedProduct:null
+    responseForAddedProduct:null,
+    topPicks:[],
+    topPickError:""
 }
 
 const productSlice = createSlice({
@@ -57,6 +59,12 @@ const productSlice = createSlice({
         },
         orderError:(state,action)=>{
             state.orderError=action.payload;
+        },
+        setTopPicks:(state,action)=>{
+          state.topPicks=action.payload;
+        },
+        setTopPicksEroor:(state,action)=>{
+          state.topPickError=action.payload;
         }
     }
 })
@@ -194,6 +202,20 @@ export function fetchProductData(state,action){
         }
     }
     //dispatch({type: 'product/fetchProductData', payload: []});
+}
+
+export function fetchTopPicks(state,action){
+  return async function (dispatch,getState) {
+    const { data, error: supabaseError } = await supabase.from("top_picks").select("*");
+        if (supabaseError) {
+          console.error("Error fetching top pciks:", supabaseError);
+          dispatch({type: 'product/setTopPicksEroor', payload: []});
+        } else {
+        const newData =data.map((el)=>{return {...el,quantity:""}})
+          console.log("top picks fetched successfully:", data);
+          dispatch({type: 'product/setTopPicks', payload: newData});
+        }
+  }
 }
 // export function addNewProduct(formData){
 //     return async function (dispatch,getState) {

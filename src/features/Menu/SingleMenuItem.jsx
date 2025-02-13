@@ -1,6 +1,31 @@
 import React from 'react'
 import "./SingleMenuItem.css"
+import { useDispatch, useSelector } from 'react-redux';
+import { addNewOrder } from '../../store/productSlice';
 export default function SingleMenuItem({item}) {
+    const orders = useSelector((state) => state.product.ordersData);
+    const dispatch =useDispatch();
+    
+    function handleProductAdd(product){
+         console.log(product);
+                const {product_id,quantity,product_name,price}=product;
+                if(orders!==null && orders.find((el)=>el.product_id==product_id)){
+                    dispatch(addNewOrder([...orders.filter((el)=>el.product_id!==product_id),{product_id,quantity:1,product_name,price}]))
+                }else{
+                    dispatch(addNewOrder([...orders,{product_id,quantity:1,product_name,price}]));
+                    
+                }
+                dispatch(updateQuantity({pid:product_id,quantity:1}));
+                window.localStorage.setItem("ordersInCart",JSON.stringify([...orders,{product_id,quantity:1,product_name,price}]));
+               
+                toast.success("Item has been added to cart",{
+                  position: "top-center", // Example: Set all toasts to top center
+                  autoClose: 2000, // Example: Set all toasts to 3 seconds
+                  draggable: true, // Example: Disable dragging for all toasts
+                  // ... other global options
+                  className:"toast-add-item"
+                });
+    }
   return (
     <div className="menu-item">
       <div className="item-description">
@@ -32,7 +57,7 @@ export default function SingleMenuItem({item}) {
       </div>
       <div className="item-right-section">
         <img src={item.image_url} alt={item.product_name}></img>
-        <button className="button-add">ADD</button>
+        <button className="button-add" onClick={(e)=>{handleProductAdd(item)}}>ADD</button>
       </div>
     </div>
   );

@@ -2,10 +2,15 @@ import React, { useState } from 'react'
 import "./MenuCategory.css"
 import { all } from 'axios';
 import SingleMenuItem from './SingleMenuItem';
+const menuArray=["Fries","Maggie","Momo's","Kuka"];
 export default function MenuCategory({products}) {
   const[]=  useState();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const allCategory={}
   console.log(products,"=======")
+  function toggleMenu(){
+    setIsMenuOpen(()=>!isMenuOpen);
+  }
   products.map((el)=>{
     if(!allCategory[el.product_category]){
         allCategory[el.product_category]=[el];
@@ -21,7 +26,7 @@ export default function MenuCategory({products}) {
           <Section title="Indian" count={81}> {/* Example with nested sections */}
             <Section title="Fries section" count={fries?.length || 0}>
               {/* Add your Veg Main Course items here */}
-              {fries?.length>0 &&fries.map((item)=>{
+              {fries?.length>0 && fries.map((item)=>{
                 return <SingleMenuItem item={item}></SingleMenuItem>
               })}
               
@@ -39,6 +44,23 @@ export default function MenuCategory({products}) {
             {/* Add your Breads items here */}
           </Section>
           {/* ... other main sections */}
+
+          {isMenuOpen && ( // Conditionally render the menu overlay
+        <div className="menu-overlay">
+          <div className="black-menu-container">
+            {menuArray.map((el)=>{
+              return <div className="menu-single-item">
+                <span className='heading-singleline'>{el}</span>
+                <span className='count-singleline'>{fries?.length||0}</span>
+              </div>;
+            })}
+          </div>
+        </div>
+      )}
+
+          <button className="menu-button-bottom" onClick={toggleMenu}>
+        MENU
+      </button>
         </div>
       
   ))
