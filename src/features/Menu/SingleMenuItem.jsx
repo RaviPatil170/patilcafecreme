@@ -1,36 +1,50 @@
 import React from 'react'
 import "./SingleMenuItem.css"
 import { useDispatch, useSelector } from 'react-redux';
-import { addNewOrder } from '../../store/productSlice';
+import { addNewOrder, updateQuantity } from '../../store/productSlice';
+import { toast } from 'react-toastify';
 export default function SingleMenuItem({item}) {
     const orders = useSelector((state) => state.product.ordersData);
+   const  quantityForButton =orders.find((el)=>el.menuItemId==item.menuItemId) ;
+   console.log(quantityForButton,"quantityForButton")
     const dispatch =useDispatch();
-    
-    function handleProductAdd(product){
-         console.log(product);
-                const {product_id,quantity,product_name,price}=product;
-                if(orders!==null && orders.find((el)=>el.product_id==product_id)){
-                    dispatch(addNewOrder([...orders.filter((el)=>el.product_id!==product_id),{product_id,quantity:1,product_name,price}]))
-                }else{
-                    dispatch(addNewOrder([...orders,{product_id,quantity:1,product_name,price}]));
-                    
-                }
-                dispatch(updateQuantity({pid:product_id,quantity:1}));
-                window.localStorage.setItem("ordersInCart",JSON.stringify([...orders,{product_id,quantity:1,product_name,price}]));
-               
-                toast.success("Item has been added to cart",{
-                  position: "top-center", // Example: Set all toasts to top center
-                  autoClose: 2000, // Example: Set all toasts to 3 seconds
-                  draggable: true, // Example: Disable dragging for all toasts
-                  // ... other global options
-                  className:"toast-add-item"
-                });
+    function handleProductAdd(item) {
+      console.log(item);
+      dispatch(addNewOrder(item));
+      dispatch(
+        updateQuantity({ menuItemId: item.menuItemId, quantity: 1 })
+      );
+      window.localStorage.setItem("ordersInCart",JSON.stringify([...orders]));
+
+      toast.success("Item has been added to cart", {
+        position: "top-center", // Example: Set all toasts to top center
+        autoClose: 2000, // Example: Set all toasts to 3 seconds
+        draggable: true, // Example: Disable dragging for all toasts
+        // ... other global options
+        className: "toast-add-item",
+      });
     }
+
+    //let quantityTopPicks =orders.find((el)=>el.product_id==item.product_id);
+      const handleIncrement = () => {
+        dispatch(
+          updateQuantity({menuItemId: item.menuItemId,quantity: item.quantity + 1,})
+        );
+      };
+
+      const handleDecrement = () => {
+        if (item?.quantity >= 0) {
+          dispatch(
+            updateQuantity({menuItemId: item.menuItemId,quantity: item.quantity - 1,
+            })
+          );
+        }
+      };
   return (
     <div className="menu-item">
       <div className="item-description">
         <div className="name-price">
-          <span className="item-name">{item.product_name}</span>
+          <span className="item-name">{item.itemName}</span>
           <span className="item-price">
             <span className="ruppe-symbol">₹</span>
             {item.price}
@@ -53,11 +67,19 @@ export default function SingleMenuItem({item}) {
           </svg>
           4.5
         </span>
-        <span className="item-summary">{item.product_description}</span>
+        <span className="item-summary">{item.description}</span>
       </div>
       <div className="item-right-section">
-        <img src={item.image_url} alt={item.product_name}></img>
-        <button className="button-add" onClick={(e)=>{handleProductAdd(item)}}>ADD</button>
+        <img src={item.image_url} alt={item.itemName} loading='lazy'></img>
+        {  quantityForButton?.quantity == 0 || quantityForButton==undefined? (
+           <button className="button-add" onClick={(e)=>{handleProductAdd(item)}}>ADD</button>
+        ) : (
+          <div className="quantity-controls-single-menu-item">
+            <button onClick={handleDecrement} className="prev-btn">-</button>
+            <span>{quantityForButton?.quantity}</span>
+            <button onClick={handleIncrement} className="next-btn">+</button>
+          </div>
+        )}
       </div>
     </div>
   );

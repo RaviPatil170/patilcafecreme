@@ -1,0 +1,1 @@
+export const CATEGORY=['Kuka','IceCreme','Maggie','Hot_Coffee','Fries'];

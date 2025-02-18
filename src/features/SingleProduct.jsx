@@ -11,7 +11,6 @@ export default function SingleProduct({product}) {
     const dispatch =useDispatch();
    
     function addToOrders(e,product){
-        console.log(product);
         const {product_id,quantity,product_name,price}=product;
         if(orders!==null && orders.find((el)=>el.product_id==product_id)){
             dispatch(addNewOrder([...orders.filter((el)=>el.product_id!==product_id),{product_id,quantity:1,product_name,price}]))

@@ -1,23 +1,24 @@
 .modal {
   position: fixed;
-  z-index: 1;
-  top: 50%; /* Position the top edge in the vertical center */
-  left: 50%; /* Position the left edge in the horizontal center */
-  transform: translate(-50%, -50%); /* Center the element */
-  width: 800px; /* Default width for desktop */
-  max-height: 80vh; /* Maximum 80% of the viewport height */
-  overflow-y: scroll; /* Add scrollbar if content overflows */
-  background-color: rgba(0,0,0,0.4);
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.7);
+  transition: opacity 500ms;
+  opacity: 1;
 }
 
 
 
 .modal-content {
   background-color: #fefefe;
-  margin: 5%;
+  margin: 70px auto;
   padding: 20px;
-  border: 1px solid #888;
-  width: 90%;
+  border-radius: 5px;
+  width: 50%;
+  position: relative;
+  transition: all 5s ease-in-out;
 }
 
 .close {

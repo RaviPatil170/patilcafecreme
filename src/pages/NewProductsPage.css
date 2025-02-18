@@ -7,3 +7,10 @@
     border: none;
    
 }
+
+@media (max-width:768px){
+    
+    .new-menu-container{
+        width: 100%;
+    }
+}

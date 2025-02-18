@@ -174,3 +174,73 @@
     filter: brightness(1.5);
     cursor: pointer;
   }
+
+
+  .quantity-controls-single-menu-item{
+    position: absolute;
+    left: 20px;
+    bottom: -12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 120px;
+    height: 40px;
+    background-color: #f8f9fa;
+    border: 1px solid rgb(222, 220, 220);
+    border-radius: 8px;
+    font-family: sans-serif;
+    font-weight: 800;
+    font-size: 18px;
+    line-height: 24px;
+    text-transform: uppercase;
+    color: rgb(27, 166, 114);
+    transition: box-shadow 0.3s ease;;
+
+    &:hover{
+    cursor: pointer;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+    background-color: #f1f3f5;
+}
+}
+.quantity-controls-single-menu-item button{
+    border: none;
+    background-color: #f8f9fa;
+    color: rgb(27, 166, 114);
+    padding: 4px 12px;
+    font-size: 18px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 800;
+    font-family: "Poppins",sans-serif;
+}
+.quantity-controls-single-menu-item .prev-btn{
+    border-radius: 10px 0 0 10px;
+    &:hover{
+        background-color: #f9fbfdfc;
+    }
+}
+.quantity-controls-single-menu-item .next-btn{
+    border-radius: 0 10px 10px 0;
+    &:hover{
+        background-color: #f9fbfdfc;
+    }
+}
+
+@media (max-width: 767px) {
+  .section {
+    margin-bottom: 5px; /* Reduced margin */
+  }
+
+
+  .menu-item {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 20px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid #eee;
+    
+  }
+  
+}

@@ -13,9 +13,7 @@ export default function Header() {
     //let toggle_image_address=;
     const [toggle_image_address,setToggle_image_address]=useState('/right side/Flying Burger PNG Image - 2084x2084.png')
     function toggleBurger(e,src,){
-    console.log(src);
             setToggle_image_address(()=>src);
-
     }
   return (
     <header>

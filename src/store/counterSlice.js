@@ -46,7 +46,6 @@ export  function fetchProductData(state,action){
           console.error("Error fetching countries:", supabaseError);
           dispatch({type: 'counter/fetchProductData', payload: []});
         } else {
-          console.log("Countries fetched successfully:", data);
           dispatch({type: 'counter/fetchProductData', payload: data});
         }
     }

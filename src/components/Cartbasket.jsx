@@ -1,6 +1,6 @@
 import React from 'react'
 import { useDispatch } from 'react-redux';
-import { addNewOrder,fetchOrderDetails, removeItemFromCart, updateQuantity } from '../store/productSlice';
+import { addNewOrder,fetchOrderDetails, removeItemFromCart, removeItemFromCartOnZero, updateQuantity } from '../store/productSlice';
 import "./Cart.css";
 //import "./Cartbasket.css";
 export default function Cartbasket({orders,closeModal}) {
@@ -10,87 +10,77 @@ export default function Cartbasket({orders,closeModal}) {
         localStorage.setItem("ordersInCart",[]);
         dispatch(fetchOrderDetails(orders));
         closeModal();
-        //console.log("responseForAddedProduct",responseForAddedProduct);
+      
       }
       function cancelOrder(){
-        dispatch(addNewOrder([]));
+        dispatch(addNewOrder(""));
         localStorage.setItem("ordersInCart",[]);
         closeModal();
       }
-      const handleQuantityChange = (index, newQuantity) => {
-        debugger;
-        dispatch(updateQuantity({pid:index,quantity:newQuantity}))
+      const handleQuantityChange = (menuItemId, newQuantity) => {
+        if(newQuantity==0){
+          dispatch(removeItemFromCartOnZero({menuItemId:menuItemId}));
+          return;
+        }
+        
+        dispatch(updateQuantity({menuItemId:menuItemId,quantity:parseInt(newQuantity)}))
       };
     
-      const handleRemoveItem = (product_id) => {
-        dispatch(removeItemFromCart(product_id));
+      const handleRemoveItem = (menuItemId) => {
+        dispatch(removeItemFromCart(menuItemId));
       };
     
       const calculateSubtotal = () => {
         return orders.reduce((sum, item) => sum + item.price * item.quantity, 0);
       };
       if(orders.length==0){
-        return <div>currently nothing has been added to the Cart.</div>
+        return (
+          <div className='empty-cart'>
+            <h2>Cart Empty</h2>
+            <p >
+              Good food is always cooking! Go ahead, order some yummy items from
+              the menu.
+            </p>
+          </div>
+        );
       }
     
   return (
-    <div>
-      <table>
-        <thead>
-          <tr>
-            <th>Product</th>
-            <th>Price</th>
-            <th>Quantity</th>
-            <th>Total</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {orders.map((item, index) => (
-            <tr key={index}>
-              <td>{item.product_name}</td>
-              <td>₹{item.price.toFixed(2)}</td>
-              <td>
-                <input
-                  type="number"
-                  className="quantity"
-                  value={item.quantity}
-                  min="1"
-                  onChange={(e) =>
-                    handleQuantityChange(item.product_id, e.target.value)
-                  }
-                />
-              </td>
-              <td>₹{(item.price * item.quantity).toFixed(2)}</td>
-              <td>
-                <button
-                  className="remove"
-                  onClick={() => handleRemoveItem(item.product_id)}
-                >
-                  Remove
-                </button>
-              </td>
-            </tr>
-          ))}
-          <tr>
-            <td colSpan="3" style={{ textAlign: "right", fontWeight: "bold" }}>
-              Subtotal:
-            </td>
-            <td style={{ fontWeight: "bold" }}>
-              ₹{calculateSubtotal().toFixed(2)}
-            </td>
-            <td></td>
-          </tr>
-        </tbody>
-      </table>
-      <div className="action-section">
-        <button id="place-order" name="place-order" onClick={placeOrder}>
-          Place order
-        </button>
-        <button id="cancel-order" name="cancel-order" onClick={cancelOrder}>
-          Cancel order
-        </button>
+    <div className="cart-popup">
+      <h2 className="cart-title">Your Cart</h2>
+      <div className="cart-items">
+        {orders.map((item, index) => (
+          <div className="cart-item" key={index}>
+            <div className="item-info">
+              <h3>{item.itemName}</h3>
+              <p className="item-price">₹{item.price.toFixed(2)}</p>
+            </div>
+            <div className="item-controls">
+              <input
+                type="number"
+                className="quantity-input"
+                value={item.quantity}
+                min="0"
+                onChange={(e) => handleQuantityChange(item.menuItemId, e.target.value)}
+              />
+              <p className="item-total">₹{(item.price * item.quantity).toFixed(2)}</p>
+              <button className="remove-btn" onClick={() => handleRemoveItem(item.menuItemId)}>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="white">
+                  <path d="M3 6h18M9 6V4h6v2m-9 0h12v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6h3zm3 4v6m4-6v6" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        ))}
       </div>
-    </div>
+      <div className="cart-footer">
+        <div className="subtotal">Subtotal: ₹{calculateSubtotal().toFixed(2)}</div>
+        <div className="cart-actions right-align">
+          <button className="place-order-btn" onClick={placeOrder}>Place Order</button>
+          <button className="cancel-order-btn" onClick={cancelOrder}>Cancel</button>
+        </div>
+      </div>
+      </div>
+
   );
 }

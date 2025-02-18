@@ -1,9 +1,14 @@
 .navbar {
     background-color: rgb(239, 79, 95);
     overflow: hidden;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
     
   }
-  
+  .navbar-toggle {
+    visibility: hidden;
+  }
   .nav-items{
     display: flex;
     flex-direction: row;
@@ -113,5 +118,143 @@
     box-sizing: border-box;
   }
   
+/* Mobile Responsive CSS */
 
+/* Adjust breakpoint as needed */
+@media (max-width: 768px) { 
+
+  .navbar {
+    flex-direction: row; /* Keep navbar horizontal */
+    align-items: center;
+    padding: 10px;
+    position: relative; /* For positioning the toggle button */
+    justify-content: space-between; /* Distribute space between logo and toggle */
+  }
+
+  .nav-items {
+    position: fixed; /* Fixed position for the slide-out menu */
+    top: 0;
+    left: 0;
+    width: 80%; /* Adjust width as needed */
+    height: 100%;
+    background-color: rgb(239, 79, 95); /* Same as navbar background */
+    transform: translateX(-100%); /* Initially hidden off-screen */
+    transition: transform 0.3s ease-in-out; /* Smooth transition */
+    z-index: 1001; /* Ensure it's above other content */
+    overflow-y: auto; /* Add vertical scroll if needed */
+    padding-top: 60px; /* Add padding to account for the navbar height */
+    display: flex;
+    flex-direction: column;
+  }
+
+  .nav-items.open { /* Class to toggle visibility */
+    transform: translateX(0); /* Slide in from the left */
+  }
+
+  .navbar ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .navbar a {
+    display: block;
+    color: white;
+    text-align: left; /* Align text to the left */
+    padding: 10px 20px; /* Adjust padding */
+    text-decoration: none;
+    font-family: sans-serif;
+    font-size: 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2); /* Add separator lines */
+  }
+
+  .navbar a::before { /* Remove underline effect */
+    display: none;
+  }
+
+  /* Toggle button styles */
+  .navbar-toggle {
+    background: none;
+    border: none;
+    padding: 5px;
+    cursor: pointer;
+    z-index: 1002; /* Ensure it's above the menu */
+  }
+
+  .navbar-toggle svg {
+    width: 30px;
+    height: 30px;
+    color: white;
+  }
+
+  /* Overlay to cover the main content when menu is open */
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+    z-index: 1000; /* Below the menu but above other content */
+    display: none; /* Initially hidden */
+  }
+
+  .overlay.active {
+    display: block; /* Show when menu is open */
+  }
+
+
+  .action-section {
+    flex-direction: column; /* Stack buttons vertically */
+    align-items: stretch; /* Stretch buttons to full width */
+    gap: 20px; /* Adjust gap */
+    margin-top: 20px;
+    padding: 10px; /* Add padding to the section */
+  }
+
+  .action-section button {
+    width: 100%; /* Make buttons take full width */
+    padding: 15px; /* Adjust button padding */
+    font-size: 18px; /* Slightly larger font size */
+  }
+
+  .modal-body {
+    flex-direction: column; /* Stack modal content vertically */
+    align-items: center; /* Center items horizontally */
+    gap: 30px; /* Adjust gap */
+    padding: 20px; /* Add padding */
+  }
+
+  .cart-icon {
+    /* Cart icon styles for mobile (if needed) */
+  }
+
+  .cart-count {
+    /* Cart count styles for mobile (if needed) */
+    font-size: 16px; /* Adjust font size */
+    width: 20px;
+    height: 20px;
+  }
+
+  svg {
+    width: 30px;
+    height: 30px;
+  }
+}
+
+
+
+/* Small screens (if needed) */
+@media (max-width: 480px) {
+  .modal-body {
+    /* Further adjustments for smaller screens */
+    gap: 20px; /* Reduce gap even more */
+  }
+  .navbar-toggle{
+    visibility: visible;
+  }
+  .action-section button {
+      font-size: 16px;
+  }
+}
   

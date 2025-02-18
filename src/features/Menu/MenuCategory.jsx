@@ -1,72 +1,60 @@
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import "./MenuCategory.css"
 import { all } from 'axios';
 import SingleMenuItem from './SingleMenuItem';
+import { Link, useLocation } from 'react-router-dom';
 const menuArray=["Fries","Maggie","Momo's","Kuka"];
 export default function MenuCategory({products}) {
   const[]=  useState();
+
+  const location = useLocation();
+  const sectionRefs = useRef({});
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const allCategory={}
-  console.log(products,"=======")
   function toggleMenu(){
     setIsMenuOpen(()=>!isMenuOpen);
   }
-  products.map((el)=>{
-    if(!allCategory[el.product_category]){
-        allCategory[el.product_category]=[el];
-    }else{
-        allCategory[el.product_category].push(el);
-    }
-  })
-  const {fries,maggie}=allCategory
-  console.log(allCategory,"===");
+  
+  const {fries,maggie}=products;
   return (
-     (
-        <div className="menu-container">
-          <Section title="Indian" count={81}> {/* Example with nested sections */}
-            <Section title="Fries section" count={fries?.length || 0}>
-              {/* Add your Veg Main Course items here */}
-              {fries?.length>0 && fries.map((item)=>{
-                return <SingleMenuItem item={item}></SingleMenuItem>
-              })}
-              
-              
-              {/* ... more items */}
-            </Section>
-            {/* ... other Indian categories */}
-            <Section title="Maggie" count={maggie?.length}>
-                {maggie?.map((item)=>{
-                    return <SingleMenuItem item={item}></SingleMenuItem>
-                })}
-            </Section>
-          </Section>
-          <Section title="Breads" count={20}>
-            {/* Add your Breads items here */}
-          </Section>
-          {/* ... other main sections */}
+    <div className="menu-container">
+      {Object.keys(products).map((category) => (
+        <Section key={category} title={category} count={products[category]?.length || 0}>
+          {products[category].length>0 && products[category]?.map((item, index) => (
+            <SingleMenuItem key={item.id || index} item={item} /> // Key prop added
+          ))}
+        </Section>
+      ))}
+    
+      
 
-          {isMenuOpen && ( // Conditionally render the menu overlay
+      {isMenuOpen && ( // Conditionally render the menu overlay
         <div className="menu-overlay">
           <div className="black-menu-container">
-            {menuArray.map((el)=>{
-              return <div className="menu-single-item">
-                <span className='heading-singleline'>{el}</span>
-                <span className='count-singleline'>{fries?.length||0}</span>
-              </div>;
+            {Object.keys(products).map((key)=>{
+             return (
+              <Link to={`#${key}`}>
+
+                <div className="menu-single-item">
+                  <span className="heading-singleline">{key}</span>
+                  <span className="count-singleline">{products[key]?.length || 0}</span>
+                </div>
+              </Link>
+              );
             })}
+           
           </div>
         </div>
       )}
 
-          <button className="menu-button-bottom" onClick={toggleMenu}>
+      <button className="menu-button-bottom" onClick={toggleMenu}>
         MENU
       </button>
-        </div>
-      
-  ))
+    </div>
+  );
 }
 
-const Section = ({ title, count, children }) => {
+const Section = ({ title, count, children ,defalutOpen}) => {
     const [isOpen, setIsOpen] = useState(false); // State for section open/close
   
     return (
@@ -110,9 +98,14 @@ const Section = ({ title, count, children }) => {
             )}
           </span>{" "}
         </div>
-        {isOpen && ( // Conditionally render the content
+        { defalutOpen|| isOpen ? ( // Conditionally render the content
           <div className="section-content">{children}</div>
-        )}
+        ):""}
       </div>
     );
   };
+
+
+  // dmd
+
+ 

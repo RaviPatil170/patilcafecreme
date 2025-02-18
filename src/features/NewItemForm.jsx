@@ -3,8 +3,10 @@ import "./NewItemForm.css";
 import { useDispatch,useSelector } from 'react-redux';
 import { addNewProduct } from '../store/productSlice';
 import { toast } from 'react-toastify';
+import { CATEGORY } from '../../constants';
 const NewItemForm = () => {
   const dispatch=useDispatch();
+
  
   const responseForAddedProduct=useSelector((state)=>state.product.responseForAddedProduct);
   const [formData, setFormData] = useState({
@@ -88,12 +90,15 @@ const NewItemForm = () => {
       </div>
       <div>
         <label htmlFor="product_category">Product Category:</label>
-        <textarea 
+        <select 
           id="product_category" 
           name="product_category" 
           value={formData.product_category} 
-          onChange={handleChange} 
-        />
+          onChange={handleChange}
+          className='category-input' 
+        >
+          {CATEGORY.map((el)=><option value={el} key={el}>{el}</option>)}
+          </select>
       </div>
       <button type="submit">Add Item</button>
     </form>

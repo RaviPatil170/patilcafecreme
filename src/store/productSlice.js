@@ -9,7 +9,7 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 
 const initialState={
-    productData:[],
+    productData:{},
     ordersData:[],
     loading:false,
     error:null,
@@ -17,7 +17,8 @@ const initialState={
     orderError:[],
     responseForAddedProduct:null,
     topPicks:[],
-    topPickError:""
+    topPickError:"",
+
 }
 
 const productSlice = createSlice({
@@ -34,24 +35,50 @@ const productSlice = createSlice({
             state.responseForAddedProduct=action.payload;
         },
         addNewOrder:(state,action)=>{
-            debugger;
-            state.ordersData=[...action.payload];
-            //state.ordersData=[...state.ordersData,...action.payload];
+          
+          const item =action.payload;
+          if(!item){
+            state.ordersData=[];
+            return;
+          }
+          // if(item.topPicks){
+          //   const record =state.topPicsData.findIndex((el)=>el.menuItemId==item.menuItemId);
+
+          // }
+          const record =state.ordersData.findIndex((el)=>el.menuItemId==item.menuItemId);
+          if(record==-1){
+            state.ordersData=[...state.ordersData,item];
+          }
+          
+        },
+        removeItemFromCartOnZero:(state,action)=>{
+          const {menuItemId}=action.payload;
+          state.ordersData=state.ordersData.filter((item)=>item.menuItemId!==menuItemId);
         },
         updateQuantity:(state,action)=>{
-            debugger;
-            const {pid,quantity}=action.payload;
-            const d=state.ordersData.map((el)=>{
-                if(el.product_id==pid){
+            const {menuItemId,quantity}=action.payload;
+
+            const isRecordInTopPicks =state.topPicks.findIndex((el)=>el.menuItemId==menuItemId);
+            if(isRecordInTopPicks!==-1){
+              const d=state.topPicks.map((el)=>{
+                if(el.menuItemId==menuItemId){
                     el.quantity=quantity;
                 }
                 return el;
-            })
+            })           
+            state.topPicks=[...d];
+            }
+            const d=state.ordersData.map((el)=>{
+                if(el.menuItemId==menuItemId){
+                    el.quantity=quantity;
+                }
+                return el;
+            })           
             state.ordersData=[...d];
         },
         removeItemFromCart:(state,action)=>{
             const id =action.payload;
-            const newOrdersData=state.ordersData.filter((item)=>item.product_id!==id);
+            const newOrdersData=state.ordersData.filter((item)=>item.menuItemId!==id);
             state.ordersData=newOrdersData;
         },
         setOrdersFromLocalStorage:(state,action)=>{
@@ -71,7 +98,7 @@ const productSlice = createSlice({
 
 
 
-export const {addNewOrder,updateQuantity,removeItemFromCart,setOrdersFromLocalStorage}=productSlice.actions;
+export const {addNewOrder,updateQuantity,removeItemFromCart,setOrdersFromLocalStorage,removeItemFromCartOnZero}=productSlice.actions;
 // export function fetchOrderDetails(orders){
 //     if (orders.length == 0) return;
 //     const order_items = orders.filter((el) => {
@@ -84,7 +111,6 @@ export const {addNewOrder,updateQuantity,removeItemFromCart,setOrdersFromLocalSt
 //     });
 //     let total_price = 0;
 //     orders.map((el) => {
-//       debugger;
 //       total_price += +el.price * parseInt(el.quantity);
 //     });
 
@@ -159,8 +185,7 @@ export function fetchOrderDetails(orders) {
         );
   
         // Success!  Now you can use the response:
-        console.log("Order saved successfully:", response.data);
-  
+      
         // Display a toast message (example using react-toastify):
          toast.success("Order placed successfully!"); // Or customize message
   
@@ -191,102 +216,96 @@ export function fetchOrderDetails(orders) {
 export function fetchProductData(state,action){
     //console.log(state,action);
     return async function(dispatch,getState){
-        const { data, error: supabaseError } = await supabase.from("product_info").select("*");
-        if (supabaseError) {
-          console.error("Error fetching countries:", supabaseError);
-          dispatch({type: 'product/fetchProductData', payload: []});
-        } else {
-        const newData =data.map((el)=>{return {...el,quantity:""}})
+        try{
+          const response =fetch(`http://13.233.79.75:8080/api/restaurants/1/menu/grouped`).then((res)=>{
+            return res.json();
+          }).then((data)=>{
+            for(const item in data){
+              data[item].map((el)=>{
+                el.quantity=0;
+              });
+            }
+            console.log(data,"after processing");
+            //const newData =data.map((el)=>{return {...el,quantity:""}})
           console.log("products fetched successfully:", data);
-          dispatch({type: 'product/fetchProductData', payload: newData});
+          dispatch({type: 'product/fetchProductData', payload: data});
+            console.log("vaibhav data",data);
+            
+          })
+        }catch(e){
+          console.log("error while fetching data",e);
         }
     }
-    //dispatch({type: 'product/fetchProductData', payload: []});
 }
 
 export function fetchTopPicks(state,action){
   return async function (dispatch,getState) {
-    const { data, error: supabaseError } = await supabase.from("top_picks").select("*");
-        if (supabaseError) {
-          console.error("Error fetching top pciks:", supabaseError);
-          dispatch({type: 'product/setTopPicksEroor', payload: []});
-        } else {
-        const newData =data.map((el)=>{return {...el,quantity:""}})
-          console.log("top picks fetched successfully:", data);
-          dispatch({type: 'product/setTopPicks', payload: newData});
+    try{
+      const response =fetch(`http://13.233.79.75:8080/api/restaurants/1/menu/grouped`).then((res)=>{
+        return res.json();
+      }).then((data)=>{
+        const topPicsData=[];
+        for(const item in data){
+          data[item].map((el,i)=>{
+            el.quantity=0;
+            if(i==0)topPicsData.push(el);
+          });
         }
+      console.log(data,"after processing top pics");
+      console.log("top pics data", data);
+      dispatch({type: 'product/setTopPicks', payload: topPicsData});
+  
+        
+      })
+    }catch(e){
+      console.log("error while fetching data",e);
+    }
+
+
+    
   }
 }
-// export function addNewProduct(formData){
-//     return async function (dispatch,getState) {
-//         try {
-//             const response = await axios.post(
-//               `${supabaseUrl}/rest/v1/product_info`, // Replace with your Supabase URL and table name
-//               formData, 
-//               {
-//                 headers: {
-//                   'apikey': supabaseAnonKey, // Replace with your Supabase API Key
-//                   'Content-Type': 'application/json',
-//                 },
-//               }
-//             );
-//             console.log(response,"-----");
-//             dispatch({type: 'product/addNewProduct', payload: response.data});
-//             toast.success("new food item has been saved successfully");
-//             dispatch(fetchProductData());
-//         }catch(e){
-//             console.log(e,"error while sendind data");
-//             toast.error("there is some error while saving the data");
-//             dispatch({type: 'product/addNewProduct', payload: response.error});
-//         }
-        
-//     }
-// }
+
 export function addNewProduct(formData) {
-    
-    return async function (dispatch, getState) {
-      try {
-        const response = await axios.post(
-          `${supabaseUrl}/rest/v1/product_info`,
-          formData,
-          {
-            headers: {
-              'apikey': supabaseAnonKey,
-              'Content-Type': 'application/json',
-            },
-          }
-        );
-        debugger;
-        console.log("Response from Supabase:", response.data); // Log the full response
-  
-        // Check for successful insertion (status code 201 is typical for POST)
-        if (response.status === 201) {
-          dispatch({ type: 'product/addNewProduct', payload: response.data }); // Dispatch the data
-          toast.success("New food item has been saved successfully!");
-          dispatch(fetchProductData()); // Refresh the product list
-  
-          return response.data; // Return the response data (important!)
-  
-        } else {
-          // Handle unexpected status codes (e.g., errors from Supabase)
-          const errorMessage = response.data?.message || "Error saving product."; // Get error message from response or default message.
-          console.error("Supabase returned an error:", response.status, errorMessage);
-          toast.error(errorMessage);
-         // dispatch({ type: 'product/addNewProductError', payload: errorMessage }); // Dispatch the error message
-          throw new Error(errorMessage); // Re-throw the error to be caught by the caller if needed
-        }
-  
-  
-      } catch (error) {
-        console.error("Error sending data:", error);
-  
-        const errorMessage = error.response?.data?.message || error.message || "Error saving product."; // Improved error handling
-        toast.error(errorMessage);
-        //dispatch({ type: 'product/addNewProductError', payload: errorMessage }); // Dispatch the error message
-        throw error; // Re-throw for caller handling
-  
-      }
+  return async function (dispatch, getState) {
+    const raw = JSON.stringify({
+      menuItemId: "",
+      restaurantId: 1,
+      itemName: formData.product_name,
+      description: formData.product_description,
+      price: formData.price,
+      category: formData.product_category,
+      image_url: formData.image_url,
+      is_vegetarian: true,
+      is_vegan: false,
+      is_gluten_free: false,
+    });
+
+    const requestOptions = {
+      method: "POST", // Change to POST, PUT, DELETE, etc. as needed
+      headers: {
+        "Content-Type": "application/json", // Important for sending JSON data
+        // ... any other headers
+      },
+      body: raw,
     };
-  }
+
+    fetch("http://13.233.79.75:8080/api/restaurants/1/menu", requestOptions)
+      .then((response) => {
+        if (!response.ok) {
+          // Check for HTTP errors (status not in the 200-299 range)
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json(); // Parse JSON response only if the request was successful
+      })
+      .then((result) => {
+        console.log(result);
+      })
+      .catch((error) => console.error(error));
+  };
+}
 
 export default productSlice.reducer;
+
+
+

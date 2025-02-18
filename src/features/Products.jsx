@@ -20,7 +20,7 @@ function Products() {
     dispatch(fetchProductData())
   }, []);
   
-  //console.log(orders,"------")
+
   return (
     <div>
       {isLoading ? (
