@@ -189,3 +189,114 @@
         background-color: #f9fbfdfc;
     }
 }
+
+
+@media (max-width: 767px) {
+    .toppicks-outer-container{
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+
+    }
+    .toppicks-container {
+        width: 100%; /* Full width for the inner container */
+        display: flex;
+        flex-direction: row;
+        overflow-x: auto; /* Enable horizontal scrolling */
+        justify-content: flex-start;
+        align-items: center;
+        gap: 20px; /* Adjust gap */
+        padding: 10px;
+        scroll-behavior: smooth;
+    }
+    
+    .item-container {
+        flex-shrink: 0;
+        width: 220px; /* Slightly smaller item width */
+        height: 220px; /* Maintain aspect ratio */
+        position: relative;
+        border-radius: 10px;
+        color: #fff;
+        background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), var(--bg-image);
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .toppicks-header-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%; /* Full width */
+        box-sizing: border-box;
+    }
+    
+    .toppicks-header-section h3 {
+        font-size: 1.2rem; /* Adjust font size */
+        margin-bottom: 0;
+    }
+    
+    .toppick-nav-buttons {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px; /* Smaller gap */
+        margin-top: 10px; /* Add some top margin */
+    }
+    
+    /* ... (rest of your existing CSS) ... */
+    
+    /* Mobile Styles */
+    @media (max-width: 767px) {
+        .toppicks-outer-container {
+            width: 100%; /* Full width on mobile */
+            max-width: none; /* Remove max-width */
+        }
+    
+        .toppicks-container {
+            gap: 10px; /* Smaller gap on mobile */
+            padding: 5px;
+            /* For Internet Explorer and Edge */
+    -ms-overflow-style: none;
+
+    /* For Firefox */
+    scrollbar-width: none;
+        }
+        .toppicks-container ::-webkit-scrollbar {
+            display: none;
+        }
+    
+        .item-container {
+            width: 180px; /* Smaller item width */
+            height: 180px; /* Maintain aspect ratio */
+        }
+    
+        .toppicks-header-section h3 {
+            font-size: 1rem; /* Smaller font size on mobile */
+        }
+    
+        .top-pick-name {
+            font-size: 0.9rem; /* Smaller font size on mobile */
+        }
+    
+        .price-add-button {
+            flex-direction: column; /* Stack price and button */
+            align-items: flex-start;
+            gap: 5px;
+        }
+    
+        .top-pick-button, .quantity-controls {
+            width: 100%; /* Full width button on mobile */
+            font-size: 1rem;
+        }
+        .quantity-controls{
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .quantity-controls button{
+            font-size: 1rem;
+        }
+    }
+}

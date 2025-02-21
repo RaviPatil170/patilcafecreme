@@ -1,6 +1,5 @@
-import React, { useRef, useState } from 'react'
+import React, { useRef, useState,useEffect } from 'react'
 import "./MenuCategory.css"
-import { all } from 'axios';
 import SingleMenuItem from './SingleMenuItem';
 import { Link, useLocation } from 'react-router-dom';
 const menuArray=["Fries","Maggie","Momo's","Kuka"];
@@ -10,43 +9,68 @@ export default function MenuCategory({products}) {
   const location = useLocation();
   const sectionRefs = useRef({});
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const allCategory={}
+
+  useEffect(() => {
+    const scrollToSection = () => {
+      const hash = location.hash;
+      if (hash) {
+        const sectionId = hash.substring(1);
+        const section = sectionRefs.current[sectionId];
+        if (section) {
+          section.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+    };
+
+    scrollToSection(); // Scroll on initial render (if there's a hash)
+
+  }, [location]); // Run effect when location changes
+
+
+  const handleLinkClick = (category) => {
+    setIsMenuOpen(false); // Close the menu *before* scrolling
+  };
   function toggleMenu(){
     setIsMenuOpen(()=>!isMenuOpen);
   }
   
-  const {fries,maggie}=products;
+  
   return (
     <div className="menu-container">
       {Object.keys(products).map((category) => (
-        <Section key={category} title={category} count={products[category]?.length || 0}>
-          {products[category].length>0 && products[category]?.map((item, index) => (
-            <SingleMenuItem key={item.id || index} item={item} /> // Key prop added
+        <Section
+          key={category}
+          id={category}
+          ref={(el) => (sectionRefs.current[category] = el)}
+          title={category}
+          count={products[category]?.length || 0}
+        >
+          {products[category]?.map((item, index) => (
+            <SingleMenuItem key={item.id || index} item={item} />
           ))}
         </Section>
       ))}
     
       
 
-      {isMenuOpen && ( // Conditionally render the menu overlay
+    {isMenuOpen && (
         <div className="menu-overlay">
           <div className="black-menu-container">
-            {Object.keys(products).map((key)=>{
-             return (
-              <Link to={`#${key}`}>
-
+            {Object.keys(products).map((key) => (
+              <Link
+                key={key}
+                to={`#${key}`}
+                onClick={() => handleLinkClick(key)} // Call handleLinkClick
+              >
                 <div className="menu-single-item">
                   <span className="heading-singleline">{key}</span>
                   <span className="count-singleline">{products[key]?.length || 0}</span>
                 </div>
               </Link>
-              );
-            })}
-           
+            ))}
           </div>
         </div>
       )}
-
       <button className="menu-button-bottom" onClick={toggleMenu}>
         MENU
       </button>
@@ -106,6 +130,6 @@ const Section = ({ title, count, children ,defalutOpen}) => {
   };
 
 
-  // dmd
+ 
 
  

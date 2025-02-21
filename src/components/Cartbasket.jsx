@@ -53,7 +53,7 @@ export default function Cartbasket({orders,closeModal}) {
           <div className="cart-item" key={index}>
             <div className="item-info">
               <h3>{item.itemName}</h3>
-              <p className="item-price">₹{item.price.toFixed(2)}</p>
+             
             </div>
             <div className="item-controls">
               <input
@@ -63,7 +63,7 @@ export default function Cartbasket({orders,closeModal}) {
                 min="0"
                 onChange={(e) => handleQuantityChange(item.menuItemId, e.target.value)}
               />
-              <p className="item-total">₹{(item.price * item.quantity).toFixed(2)}</p>
+              <span className="item-total">₹{(item.price * item.quantity).toFixed(2)}</span>
               <button className="remove-btn" onClick={() => handleRemoveItem(item.menuItemId)}>
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="white">
                   <path d="M3 6h18M9 6V4h6v2m-9 0h12v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6h3zm3 4v6m4-6v6" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>

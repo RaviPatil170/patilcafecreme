@@ -117,6 +117,9 @@
     border: 2px solid white;
     box-sizing: border-box;
   }
+  .mobile-only{
+    display: none;
+  }
   
 /* Mobile Responsive CSS */
 
@@ -135,16 +138,19 @@
     position: fixed; /* Fixed position for the slide-out menu */
     top: 0;
     left: 0;
-    width: 80%; /* Adjust width as needed */
+    width: 50%; /* Adjust width as needed */
     height: 100%;
-    background-color: rgb(239, 79, 95); /* Same as navbar background */
+    background-color: rgba(239, 79, 90, 0.497); /* Same as navbar background */
     transform: translateX(-100%); /* Initially hidden off-screen */
     transition: transform 0.3s ease-in-out; /* Smooth transition */
     z-index: 1001; /* Ensure it's above other content */
     overflow-y: auto; /* Add vertical scroll if needed */
-    padding-top: 60px; /* Add padding to account for the navbar height */
+     /* Add padding to account for the navbar height */
     display: flex;
     flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    
   }
 
   .nav-items.open { /* Class to toggle visibility */
@@ -227,6 +233,10 @@
 
   .cart-icon {
     /* Cart icon styles for mobile (if needed) */
+    display: none;
+  }
+  .mobile-only{
+    display: block;
   }
 
   .cart-count {
@@ -255,6 +265,9 @@
   }
   .action-section button {
       font-size: 16px;
+  }
+  .mobile-only{
+    display: block;
   }
 }
   
