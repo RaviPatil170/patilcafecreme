@@ -1,5 +1,6 @@
 import NewItemForm from "./NewItemForm";
-import PracticeStar from "./practiceStar";
+
+
 
 
 function AddNewProducts() {
@@ -7,7 +8,7 @@ function AddNewProducts() {
     <div>
       <h1>Add New Products</h1>
       rhiai iaaaa
-      <PracticeStar></PracticeStar>
+      
       <NewItemForm />
     </div>
   );
