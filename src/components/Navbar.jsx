@@ -31,6 +31,9 @@ const dispatch =useDispatch();
  function closeModal() {
    setIsOpen(() => false);
  }
+ function handleClick(){
+  setIsNavbarOpen(()=>false)
+ }
  console.log(orders,"from  navbar page");
    return (
      <>
@@ -58,13 +61,13 @@ const dispatch =useDispatch();
          </button>
          <ul className={`nav-items ${isNavbarOpen ? "open" : ""}`}>
            <li>
-             <Link to="/">Home</Link>
+             <Link to="/" onClick={handleClick}>Home</Link>
            </li>
            <li>
-             <Link to="/addnewproducts">Add new Item</Link>
+             <Link to="/addnewproducts" onClick={handleClick}>Add new Item</Link>
            </li>
            <li>
-             <Link to="/newordermenu">New Menu</Link>
+             <Link to="/newordermenu" onClick={handleClick}>New Menu</Link>
            </li>
            <li onClick={handleCart} className="cart-icon">
              <svg

@@ -1,311 +1,312 @@
-import { autoBatchEnhancer, createSlice } from '@reduxjs/toolkit'
-import  axios  from 'axios';
-import { toast } from 'react-toastify'; 
+import { createSlice } from "@reduxjs/toolkit";
+import { toast } from "react-toastify";
 import { createClient } from "@supabase/supabase-js";
-const supabaseUrl = "https://crxvwnueirwsbrvmlwem.supabase.co"; // Corrected URL format
-const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNyeHZ3bnVlaXJ3c2Jydm1sd2VtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY5Mzc2MDcsImV4cCI6MjA1MjUxMzYwN30.QjseonqK545EcPWnPvL48r496V-5-ezs1ciPPSOkNlw"; // Removed duplicate https
+
+const supabaseUrl = "https://ahbqwdvotjqyjjicsvdf.supabase.co";
+const supabaseAnonKey =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFoYnF3ZHZvdGpxeWpqaWNzdmRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUzNTAzMzUsImV4cCI6MjA4MDkyNjMzNX0.mgZsIi-9IWymRDN6i65F7Przbt4wxIWPatXYz6tjk0I";
 
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
+const loadOrdersFromStorage = () => {
+  try {
+    const raw = window.localStorage.getItem("ordersInCart");
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+};
 
-const initialState={
-    productData:{},
-    ordersData:[],
-    loading:false,
-    error:null,
-    ordersPlaced:[],
-    orderError:[],
-    responseForAddedProduct:null,
-    topPicks:[],
-    topPickError:"",
+const initialState = {
+  // flat array of products from Supabase
+  productData: [],
+  // cart
+  ordersData: loadOrdersFromStorage(),
+  loading: false,
+  error: null,
 
-}
+  ordersPlaced: {},
+  orderError: [],
+  responseForAddedProduct: null,
+  topPicks: [],
+  topPickError: "",
+};
 
 const productSlice = createSlice({
-    name:'product',
-    initialState,
-    reducers:{
-        fetchOrderDetails:(state,action)=>{
-            state.ordersPlaced=action.payload;
-        },
-        fetchProductData: (state, action) => {
-            state.productData = action.payload;
-        },
-        addNewProduct:(state,action)=>{
-            state.responseForAddedProduct=action.payload;
-        },
-        addNewOrder:(state,action)=>{
-          
-          const item =action.payload;
-          if(!item){
-            state.ordersData=[];
-            return;
-          }
-          // if(item.topPicks){
-          //   const record =state.topPicsData.findIndex((el)=>el.menuItemId==item.menuItemId);
+  name: "product",
+  initialState,
+  reducers: {
+    fetchOrderDetails: (state, action) => {
+      state.ordersPlaced = action.payload;
+    },
 
-          // }
-          const record =state.ordersData.findIndex((el)=>el.menuItemId==item.menuItemId);
-          if(record==-1){
-            state.ordersData=[...state.ordersData,item];
-          }
-          
-        },
-        removeItemFromCartOnZero:(state,action)=>{
-          const {menuItemId}=action.payload;
-          state.ordersData=state.ordersData.filter((item)=>item.menuItemId!==menuItemId);
-        },
-        updateQuantity:(state,action)=>{
-            const {menuItemId,quantity}=action.payload;
+    // fill productData with Supabase products
+    fetchProductData: (state, action) => {
+      state.productData = action.payload || [];
+      state.loading = false;
+      state.error = null;
+    },
 
-            const isRecordInTopPicks =state.topPicks.findIndex((el)=>el.menuItemId==menuItemId);
-            if(isRecordInTopPicks!==-1){
-              const d=state.topPicks.map((el)=>{
-                if(el.menuItemId==menuItemId){
-                    el.quantity=quantity;
-                }
-                return el;
-            })           
-            state.topPicks=[...d];
-            }
-            const d=state.ordersData.map((el)=>{
-                if(el.menuItemId==menuItemId){
-                    el.quantity=quantity;
-                }
-                return el;
-            })           
-            state.ordersData=[...d];
-        },
-        removeItemFromCart:(state,action)=>{
-            const id =action.payload;
-            const newOrdersData=state.ordersData.filter((item)=>item.menuItemId!==id);
-            state.ordersData=newOrdersData;
-        },
-        setOrdersFromLocalStorage:(state,action)=>{
-            state.ordersData=action.payload;
-        },
-        orderError:(state,action)=>{
-            state.orderError=action.payload;
-        },
-        setTopPicks:(state,action)=>{
-          state.topPicks=action.payload;
-        },
-        setTopPicksEroor:(state,action)=>{
-          state.topPickError=action.payload;
-        }
-    }
-})
-
-
-
-export const {addNewOrder,updateQuantity,removeItemFromCart,setOrdersFromLocalStorage,removeItemFromCartOnZero}=productSlice.actions;
-// export function fetchOrderDetails(orders){
-//     if (orders.length == 0) return;
-//     const order_items = orders.filter((el) => {
-//       return {
-//         product_id: el.product_id,
-//         product_name: el.product_name,
-//         price: el.price,
-//         quantity: el.quantity,
-//       };
-//     });
-//     let total_price = 0;
-//     orders.map((el) => {
-//       total_price += +el.price * parseInt(el.quantity);
-//     });
-
-//     let quantity = 0;
-//     orders.map((el) => {
-//       quantity += +el.quantity;
-//     });
-//     const postBody = {
-//       total_price,
-//       quantity: quantity,
-//       order_items,
-//       user_id: "Ravi",
-//     };
-//     return async function(dispatch,getState) {
-      
-//         try {
-//             const response = await axios.post(
-//               `${supabaseUrl}/rest/v1/order_details`, // Replace with your Supabase URL and table name
-//               postBody, 
-//               {
-//                 headers: {
-//                   'apikey': supabaseAnonKey, // Replace with your Supabase API Key
-//                   'Content-Type': 'application/json',
-//                 },
-//               }
-//             );
-//         }catch(e){
-//             console.log(e,"error while sendind data");
-//         }
-//         dispatch({type:'product/fetchOrderDetails',payload:[]})
-//     }
-// }
-
-export function fetchOrderDetails(orders) {
-    if (orders.length === 0) return;
-  
-    const order_items = orders.map((el) => ({ // Use .map for transformation
-      product_id: el.product_id,
-      product_name: el.product_name,
-      price: el.price,
-      quantity: el.quantity,
-    }));
-  
-    let total_price = 0;
-    orders.forEach((el) => { // Use .forEach for side effects
-      total_price += +el.price * parseInt(el.quantity, 10); // Always use parseInt with radix
-    });
-  
-    let quantity = 0;
-    orders.forEach((el) => { // Use .forEach
-      quantity += +el.quantity;
-    });
-  
-    const postBody = {
-      total_price,
-      quantity,
-      order_items,
-      user_id: "Ravi", // Consider making this dynamic
-    };
-  
-    return async function (dispatch, getState) {
-      try {
-        const response = await axios.post(
-          `${supabaseUrl}/rest/v1/order_details`,
-          postBody,
-          {
-            headers: {
-              'apikey': supabaseAnonKey,
-              'Content-Type': 'application/json',
-            },
-          }
-        );
-  
-        // Success!  Now you can use the response:
-      
-        // Display a toast message (example using react-toastify):
-         toast.success("Order placed successfully!"); // Or customize message
-  
-        // Or, if you're not using a toast library, use an alert:
-        // alert("Order placed successfully!");
-  
-        // Dispatch an action (if needed):
-        dispatch({ type: 'product/fetchOrderDetails', payload: [] }); // Or payload: response.data if you want to store it.
-  
-        return response.data; // Return the response data if needed
-  
-      } catch (error) {
-        console.error("Error saving order:", error);
-  
-        // Display an error toast message:
-        toast.error("Error placing order. Please try again."); // Customize message
-  
-        // Or an alert:
-        // alert("Error placing order. Please try again.");
-  
-        // Dispatch an error action (if needed):
-        dispatch({ type: 'product/orderError', payload: error.message }); // Example
-  
-        throw error; // Re-throw the error for handling up the chain if necessary
+    addNewProduct: (state, action) => {
+      state.responseForAddedProduct = action.payload;
+      // optionally push into productData so UI updates instantly
+      if (action.payload) {
+        state.productData = [...state.productData, action.payload];
       }
-    };
-  }
-export function fetchProductData(state,action){
-    //console.log(state,action);
-    return async function(dispatch,getState){
-        try{
-          const response =fetch(`http://13.233.79.75:8080/api/restaurants/1/menu/grouped`).then((res)=>{
-            return res.json();
-          }).then((data)=>{
-            for(const item in data){
-              data[item].map((el)=>{
-                el.quantity=0;
-              });
-            }
-            console.log(data,"after processing");
-            //const newData =data.map((el)=>{return {...el,quantity:""}})
-          console.log("products fetched successfully:", data);
-          dispatch({type: 'product/fetchProductData', payload: data});
-            console.log("vaibhav data",data);
-            
-          })
-        }catch(e){
-          console.log("error while fetching data",e);
-        }
+    },
+
+    addNewOrder: (state, action) => {
+      const item = action.payload;
+      if (!item) {
+        state.ordersData = [];
+        window.localStorage.setItem("ordersInCart", JSON.stringify([]));
+        return;
+      }
+
+      const recordIndex = state.ordersData.findIndex(
+        (el) => el.menuItemId === item.menuItemId
+      );
+
+      if (recordIndex === -1) {
+        state.ordersData = [...state.ordersData, item];
+      } else {
+        const existing = state.ordersData[recordIndex];
+        existing.quantity = (existing.quantity || 0) + (item.quantity || 1);
+      }
+
+      window.localStorage.setItem(
+        "ordersInCart",
+        JSON.stringify(state.ordersData)
+      );
+    },
+
+    removeItemFromCartOnZero: (state, action) => {
+      const { menuItemId } = action.payload;
+      state.ordersData = state.ordersData.filter(
+        (item) => item.menuItemId !== menuItemId
+      );
+      window.localStorage.setItem(
+        "ordersInCart",
+        JSON.stringify(state.ordersData)
+      );
+    },
+
+    updateQuantity: (state, action) => {
+      const { menuItemId, quantity } = action.payload;
+
+      // update in topPicks if present
+      state.topPicks = state.topPicks.map((el) =>
+        el.menuItemId === menuItemId ? { ...el, quantity } : el
+      );
+
+      // update in ordersData and drop if quantity <= 0
+      state.ordersData = state.ordersData
+        .map((el) => (el.menuItemId === menuItemId ? { ...el, quantity } : el))
+        .filter((el) => el.quantity > 0);
+
+      window.localStorage.setItem(
+        "ordersInCart",
+        JSON.stringify(state.ordersData)
+      );
+    },
+
+    removeItemFromCart: (state, action) => {
+      const id = action.payload;
+      state.ordersData = state.ordersData.filter(
+        (item) => item.menuItemId !== id
+      );
+      window.localStorage.setItem(
+        "ordersInCart",
+        JSON.stringify(state.ordersData)
+      );
+    },
+
+    setOrdersFromLocalStorage: (state, action) => {
+      state.ordersData = action.payload || [];
+    },
+
+    orderError: (state, action) => {
+      state.orderError = action.payload;
+    },
+
+    setTopPicks: (state, action) => {
+      state.topPicks = action.payload || [];
+    },
+
+    setTopPicksEroor: (state, action) => {
+      state.topPickError = action.payload;
+    },
+  },
+});
+
+export const {
+  addNewOrder,
+  updateQuantity,
+  removeItemFromCart,
+  setOrdersFromLocalStorage,
+  removeItemFromCartOnZero,
+} = productSlice.actions;
+
+// --------------- Thunks (Supabase only) ---------------
+
+// 1) Fetch products from Supabase: table "product_info"
+export function fetchProductDataThunk() {
+  return async function (dispatch, getState) {
+    try {
+      const { data, error: supabaseError } = await supabase
+        .from("product_info")
+        .select("*");
+
+      if (supabaseError) {
+        console.error("Error fetching products:", supabaseError);
+        dispatch({ type: "product/fetchProductData", payload: [] });
+        toast.error("Error loading products");
+      } else {
+        console.log("Fetched products:", data);
+        dispatch({ type: "product/fetchProductData", payload: data });
+      }
+    } catch (err) {
+      console.error("Unexpected error fetching products:", err);
+      dispatch({ type: "product/fetchProductData", payload: [] });
+      toast.error("Unexpected error loading products");
     }
+  };
 }
 
-export function fetchTopPicks(state,action){
-  return async function (dispatch,getState) {
-    try{
-      const response =fetch(`http://13.233.79.75:8080/api/restaurants/1/menu/grouped`).then((res)=>{
-        return res.json();
-      }).then((data)=>{
-        const topPicsData=[];
-        for(const item in data){
-          data[item].map((el,i)=>{
-            el.quantity=0;
-            if(i==0)topPicsData.push(el);
+// 2) Store order into Supabase: table "orders"
+// You need a table like:
+// orders(id uuid default uuid_generate_v4(), user_name text, restaurant_id int,
+// restaurant_name text, order_date timestamptz, items jsonb, total_price numeric, total_quantity int)
+export function fetchOrderDetails(orders) {
+  if (!orders || orders.length === 0) return;
+
+  // build items for DB (you can adjust shape)
+  const orderItems = orders.map((item) => ({
+    menuItemId: item.menuItemId,
+    itemName: item.itemName,
+    price: item.price,
+    quantity: item.quantity,
+  }));
+
+  let total_price = 0;
+  let total_quantity = 0;
+
+  orders.forEach((el) => {
+    total_price += Number(el.price) * Number(el.quantity || 0);
+    total_quantity += Number(el.quantity || 0);
+  });
+
+  const payload = {
+    user_id: "Ravi",
+    order_items: orderItems, // jsonb column in Supabase
+    total_price,
+    quantity: total_quantity,
+  };
+
+  return async function (dispatch, getState) {
+    try {
+      const { data, error } = await supabase
+        .from("order_details")
+        .insert([payload])
+        .select()
+        .single();
+
+      if (error) {
+        console.error("Error inserting order:", error);
+        toast.error("Error placing order. Please try again.");
+        dispatch({ type: "product/orderError", payload: error.message });
+        return;
+      }
+
+      dispatch({ type: "product/fetchOrderDetails", payload: data });
+      toast.success("Order placed successfully!");
+      console.log("Order stored in Supabase:", data);
+    } catch (err) {
+      console.error("Unexpected error placing order:", err);
+      toast.error("Error placing order. Please try again.");
+      dispatch({ type: "product/orderError", payload: err.message });
+    }
+  };
+}
+
+// 3) Compute top picks from productData (no network)
+// Strategy: first item per category
+export function fetchTopPicks() {
+  return async function (dispatch, getState) {
+    try {
+      const { productData } = getState().product;
+
+      if (!productData || productData.length === 0) {
+        // if not loaded yet, you can optionally load:
+        // await dispatch(fetchProductDataThunk());
+        // then read again from state
+        dispatch({ type: "product/setTopPicks", payload: [] });
+        return;
+      }
+
+      const seenCategories = new Set();
+      const topPicsData = [];
+
+      productData.forEach((item) => {
+        const cat = item.product_category || "Others";
+        if (!seenCategories.has(cat)) {
+          seenCategories.add(cat);
+          topPicsData.push({
+            // mapping to your UI/cart shape:
+            menuItemId: item.product_id,
+            itemName: item.product_name,
+            description: item.product_description,
+            price: item.price,
+            image_url: item.image_url,
+            product_category: item.product_category,
+            quantity: 0,
           });
         }
-      console.log(data,"after processing top pics");
-      console.log("top pics data", data);
-      dispatch({type: 'product/setTopPicks', payload: topPicsData});
-  
-        
-      })
-    }catch(e){
-      console.log("error while fetching data",e);
+      });
+
+      console.log("Top picks derived from Supabase products:", topPicsData);
+      dispatch({ type: "product/setTopPicks", payload: topPicsData });
+    } catch (e) {
+      console.log("error while computing top picks", e);
+      dispatch({ type: "product/setTopPicksEroor", payload: e.message });
     }
-
-
-    
-  }
+  };
 }
 
+// 4) Add new product directly into Supabase: table "product_info"
 export function addNewProduct(formData) {
   return async function (dispatch, getState) {
-    const raw = JSON.stringify({
-      menuItemId: "",
-      restaurantId: 1,
-      itemName: formData.product_name,
-      description: formData.product_description,
+    const row = {
+      product_name: formData.product_name,
+      product_description: formData.product_description,
       price: formData.price,
-      category: formData.product_category,
+      product_category: formData.product_category,
       image_url: formData.image_url,
-      is_vegetarian: true,
-      is_vegan: false,
-      is_gluten_free: false,
-    });
-
-    const requestOptions = {
-      method: "POST", // Change to POST, PUT, DELETE, etc. as needed
-      headers: {
-        "Content-Type": "application/json", // Important for sending JSON data
-        // ... any other headers
-      },
-      body: raw,
+      // optionally include ingredients if you add that column:
+      ingredients: formData.ingredients || null,
     };
 
-    fetch("http://13.233.79.75:8080/api/restaurants/1/menu", requestOptions)
-      .then((response) => {
-        if (!response.ok) {
-          // Check for HTTP errors (status not in the 200-299 range)
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json(); // Parse JSON response only if the request was successful
-      })
-      .then((result) => {
-        console.log(result);
-      })
-      .catch((error) => console.error(error));
+    try {
+      const { data, error } = await supabase
+        .from("product_info")
+        .insert([row])
+        .select()
+        .single();
+
+      if (error) {
+        console.error("Error adding new product:", error);
+        toast.error("Error adding product");
+        return;
+      }
+
+      console.log("New product inserted into Supabase:", data);
+      dispatch({ type: "product/addNewProduct", payload: data });
+      toast.success("Product added successfully!");
+    } catch (err) {
+      console.error("Unexpected error adding product:", err);
+      toast.error("Unexpected error adding product");
+    }
   };
 }
 
 export default productSlice.reducer;
-
-
-
