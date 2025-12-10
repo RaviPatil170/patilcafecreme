@@ -70,7 +70,10 @@ export default function SingleMenuItem({ item }) {
 
         <span className="item-rating">4.5</span>
 
-        <span className="item-summary">{item.product_description}</span>
+        <span className="item-summary">
+          {item.product_description.split(" ").slice(0, 40).join(" ")}
+          ...<button className="show-more">more</button>
+        </span>
       </div>
 
       <div className="item-right-section">

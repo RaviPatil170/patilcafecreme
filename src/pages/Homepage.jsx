@@ -1,9 +1,9 @@
-import React from 'react'
-import { default as Homepage1 } from '../features/Homepage';
+import React from "react";
+import NewProductsPage from "./NewProductsPage";
 export default function Homepage() {
   return (
-    <div> 
-      <Homepage1></Homepage1>
+    <div>
+      <NewProductsPage></NewProductsPage>
     </div>
-  )
+  );
 }
