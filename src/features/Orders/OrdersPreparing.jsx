@@ -2,6 +2,22 @@ import React, { useEffect, useState } from "react";
 import { supabase } from "../../supabaseClient";
 import "./OrdersPreparing.css";
 
+function formatElapsedTime(isoDate) {
+  if (!isoDate) return "";
+
+  const created = new Date(isoDate);
+  const now = new Date();
+  const diffMs = now - created;
+
+  const diffMin = Math.floor(diffMs / (1000 * 60));
+  const diffHours = Math.floor(diffMin / 60);
+
+  if (diffMin < 1) return "Just now";
+  if (diffMin < 60) return `Running for ${diffMin} min`;
+  if (diffHours === 1) return "Running for 1 hour";
+  return `Running for ${diffHours} hours ${diffMin % 60} min`;
+}
+
 export default function OrdersPreparing() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -12,7 +28,9 @@ export default function OrdersPreparing() {
 
     const { data, error } = await supabase
       .from("order_details")
-      .select("*")
+      .select(
+        "order_id, user_id, quantity, order_items, order_status, created_at, total_price"
+      )
       .eq("order_status", "preparing")
       .order("order_id", { ascending: false });
 
@@ -27,7 +45,16 @@ export default function OrdersPreparing() {
   }
 
   useEffect(() => {
+    // initial load
     loadPreparingOrders();
+
+    // auto-refresh every 15 seconds
+    const intervalId = setInterval(() => {
+      loadPreparingOrders();
+    }, 60000);
+
+    // cleanup
+    return () => clearInterval(intervalId);
   }, []);
 
   async function handleMarkCompleted(orderId) {
@@ -91,6 +118,9 @@ export default function OrdersPreparing() {
                   <div className="order-meta">
                     <span>User: {order.user_id}</span>
                     <span>Total Qty: {order.quantity}</span>
+                  </div>
+                  <div className="order-time-elapsed">
+                    {formatElapsedTime(order.created_at)}
                   </div>
                 </div>
                 <div className="order-actions">

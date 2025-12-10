@@ -1,49 +1,57 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import "./Navbar.css";
 import Modal from "./Modal";
 import "./Modal.css";
 import { useDispatch, useSelector } from "react-redux";
-import { addNewOrder, setOrdersFromLocalStorage } from "../store/productSlice";
+import { setOrdersFromLocalStorage } from "../store/productSlice";
 import Cartbasket from "./Cartbasket";
 import { fetchOrderDetails } from "../store/orderSlice";
+
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isNavbarOpen, setIsNavbarOpen] = useState(false);
 
   const dispatch = useDispatch();
   const orders = useSelector((state) => state.product.ordersData);
-  const [isNavbarOpen, setIsNavbarOpen] = useState(false); // State for navbar toggle
   const toggleButtonRef = useRef(null);
+  const location = useLocation();
 
   const handleNavbarToggle = () => {
-    setIsNavbarOpen(!isNavbarOpen);
+    setIsNavbarOpen((prev) => !prev);
   };
+
   useEffect(() => {
     if (window.localStorage.getItem("ordersInCart")) {
       const savedCart = JSON.parse(window.localStorage.getItem("ordersInCart"));
-      console.log(savedCart, "saved carts");
       dispatch(setOrdersFromLocalStorage(savedCart));
     }
-  }, []);
+  }, [dispatch]);
+
   function handleCart() {
-    setIsOpen(() => !isOpen);
+    setIsOpen((prev) => !prev);
   }
+
   function closeModal() {
-    setIsOpen(() => false);
+    setIsOpen(false);
   }
+
   function handleClick() {
-    setIsNavbarOpen(() => false);
+    setIsNavbarOpen(false);
   }
-  console.log(orders, "from  navbar page");
+
+  const totalItemsInCart =
+    orders?.reduce((acc, cur) => acc + (cur.quantity || 0), 0) || 0;
+
   return (
     <>
+      {/* TOP NAVBAR – visible on desktop / tablet */}
       <nav className="navbar">
         <button
-          className="navbar-toggle"
+          className="navbar-toggle desktop-only"
           onClick={handleNavbarToggle}
           ref={toggleButtonRef}
         >
-          {/* You can use an SVG icon for the toggle button */}
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -59,7 +67,8 @@ const Navbar = () => {
             />
           </svg>
         </button>
-        <ul className={`nav-items ${isNavbarOpen ? "open" : ""}`}>
+
+        <ul className={`nav-items desktop-only ${isNavbarOpen ? "open" : ""}`}>
           <li>
             <Link to="/" onClick={handleClick}>
               Home
@@ -90,41 +99,95 @@ const Navbar = () => {
                 d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
               />
             </svg>
-            {orders?.length > 0 && (
-              <span class="cart-count">
-                {orders?.reduce((acc, cur) => {
-                  return acc + cur.quantity;
-                }, 0)}
-              </span>
+            {totalItemsInCart > 0 && (
+              <span className="cart-count">{totalItemsInCart}</span>
             )}
           </li>
         </ul>
-        <div onClick={handleCart} className="cart-icon mobile-only">
+      </nav>
+
+      {/* BOTTOM NAVBAR – visible on mobile only */}
+      {/* BOTTOM NAVBAR – Swiggy style, visible on mobile only */}
+      <div className="bottom-nav mobile-only">
+        {/* LEFT TABS */}
+        <Link
+          to="/"
+          className={`bottom-nav-item ${
+            location.pathname === "/" ? "active" : ""
+          }`}
+        >
+          {/* Home Icon (filled) */}
+          <svg className="bottom-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 3l9 8h-3v9H6v-9H3z" />
+          </svg>
+          <span>Home</span>
+        </Link>
+
+        <Link
+          to="/addnewproducts"
+          className={`bottom-nav-item ${
+            location.pathname === "/addnewproducts" ? "active" : ""
+          }`}
+        >
+          {/* Add Icon */}
           <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
+            className="bottom-icon"
             viewBox="0 0 24 24"
-            strokeWidth={1.5}
+            fill="none"
             stroke="currentColor"
-            className="size-6 main-cart-icon"
+            strokeWidth="3"
           >
+            <path strokeLinecap="round" d="M12 5v14M5 12h14" />
+          </svg>
+          <span>Add</span>
+        </Link>
+
+        {/* CENTER FLOATING CART BUTTON */}
+        <button type="button" className="cart-fab" onClick={handleCart}>
+          <div className="cart-fab-inner">
+            <svg
+              className="bottom-icon"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+            >
+              <path d="M7 4h14l-1.5 9H8.5L7 4zM6 20a2 2 0 100-4 2 2 0 000 4zm12 0a2 2 0 100-4 2 2 0 000 4z" />
+            </svg>
+            {totalItemsInCart > 0 && (
+              <span className="cart-count-floating">{totalItemsInCart}</span>
+            )}
+          </div>
+          <span className="cart-fab-label">Cart</span>
+        </button>
+
+        {/* RIGHT TAB */}
+        <Link
+          to="/orderpreparing"
+          className={`bottom-nav-item ${
+            location.pathname === "/orderpreparing" ? "active" : ""
+          }`}
+        >
+          {/* Orders Icon (clock) */}
+          <svg
+            className="bottom-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="3"
+          >
+            <circle cx="12" cy="12" r="9"></circle>
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
-              d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
+              d="M12 7v5l3 3"
             />
           </svg>
-          {orders?.length > 0 && (
-            <span class="cart-count">
-              {orders?.reduce((acc, cur) => {
-                return acc + cur.quantity;
-              }, 0)}
-            </span>
-          )}
-        </div>
-      </nav>
+          <span>Orders</span>
+        </Link>
+      </div>
+
+      {/* Cart modal */}
       <Modal open={isOpen} closeModal={closeModal} modalHeader="Order Details">
-        <Cartbasket orders={orders} closeModal={closeModal}></Cartbasket>
+        <Cartbasket orders={orders} closeModal={closeModal} />
       </Modal>
     </>
   );
