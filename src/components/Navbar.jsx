@@ -4,12 +4,9 @@ import "./Navbar.css";
 import Modal from "./Modal";
 import "./Modal.css";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  addNewOrder,
-  fetchOrderDetails,
-  setOrdersFromLocalStorage,
-} from "../store/productSlice";
+import { addNewOrder, setOrdersFromLocalStorage } from "../store/productSlice";
 import Cartbasket from "./Cartbasket";
+import { fetchOrderDetails } from "../store/orderSlice";
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
 

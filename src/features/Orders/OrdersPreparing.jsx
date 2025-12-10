@@ -110,31 +110,28 @@ export default function OrdersPreparing() {
               </div>
 
               {/* Timeline */}
+              {/* Timeline – vertical, professional */}
               <div className="order-timeline">
                 {steps.map((label, index) => {
                   const stepNumber = index + 1;
                   const isDone = stepNumber <= currentStep;
+
                   return (
-                    <div className="timeline-step-wrapper" key={label}>
-                      <div
-                        className={
-                          "timeline-step-dot " +
-                          (isDone ? "timeline-step-dot-done" : "")
-                        }
-                      >
-                        {stepNumber}
+                    <div
+                      className={`timeline-step ${
+                        isDone ? "timeline-step-done" : ""
+                      }`}
+                      key={label}
+                    >
+                      <div className="timeline-circle">{stepNumber}</div>
+                      <div className="timeline-content">
+                        <div className="timeline-title">{label}</div>
+                        <div className="timeline-caption">
+                          {stepNumber === 1 && "Order received"}
+                          {stepNumber === 2 && "Being prepared"}
+                          {stepNumber === 3 && "Completed"}
+                        </div>
                       </div>
-                      <div className="timeline-step-label">{label}</div>
-                      {index < steps.length - 1 && (
-                        <div
-                          className={
-                            "timeline-step-line " +
-                            (stepNumber < currentStep
-                              ? "timeline-step-line-done"
-                              : "")
-                          }
-                        />
-                      )}
                     </div>
                   );
                 })}
@@ -145,11 +142,20 @@ export default function OrdersPreparing() {
                 {Array.isArray(order.order_items) &&
                   order.order_items.map((item, index) => (
                     <div className="order-row" key={index}>
-                      <span>{item.product_name}</span>
-                      <span>x{item.quantity}</span>
-                      <span>₹{item.price}</span>
+                      <div className="order-row-left">
+                        <span className="order-item-name">
+                          {item.product_name}
+                        </span>
+                        <span className="order-item-qty">x{item.quantity}</span>
+                      </div>
+                      <span className="order-item-price">₹{item.price}</span>
                     </div>
                   ))}
+                {/* Order Summary Footer */}
+                <div className="order-summary-footer">
+                  <span className="summary-left">{order.quantity} items</span>
+                  <span className="summary-right">₹{order.total_price}</span>
+                </div>
               </div>
             </div>
           );

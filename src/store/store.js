@@ -1,12 +1,12 @@
-import { applyMiddleware, combineReducers, configureStore, createStore } from '@reduxjs/toolkit'
-import  { counterSlice } from './counterSlice'
-import counterReducer from './counterSlice';
-import productReducer from "./productSlice"
-import {thunk} from 'redux-thunk';
- const rootReducer =combineReducers({
-  counter: counterReducer,
-  product:productReducer
-})
+import { configureStore } from "@reduxjs/toolkit";
+import productReducer from "./productSlice";
+import orderReducer from "./orderSlice";
 
-const store = createStore(rootReducer, applyMiddleware(thunk));
+const store = configureStore({
+  reducer: {
+    product: productReducer,
+    order: orderReducer,
+  },
+});
+
 export default store;

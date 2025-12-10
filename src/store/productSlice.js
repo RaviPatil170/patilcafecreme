@@ -1,3 +1,4 @@
+// store/productSlice.js
 import { createSlice } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 import { createClient } from "@supabase/supabase-js";
@@ -25,8 +26,6 @@ const initialState = {
   loading: false,
   error: null,
 
-  ordersPlaced: {},
-  orderError: [],
   responseForAddedProduct: null,
   topPicks: [],
   topPickError: "",
@@ -36,26 +35,21 @@ const productSlice = createSlice({
   name: "product",
   initialState,
   reducers: {
-    fetchOrderDetails: (state, action) => {
-      state.ordersPlaced = action.payload;
-    },
-
     // fill productData with Supabase products
-    fetchProductData: (state, action) => {
+    fetchProductData(state, action) {
       state.productData = action.payload || [];
       state.loading = false;
       state.error = null;
     },
 
-    addNewProduct: (state, action) => {
+    addNewProduct(state, action) {
       state.responseForAddedProduct = action.payload;
-      // optionally push into productData so UI updates instantly
       if (action.payload) {
         state.productData = [...state.productData, action.payload];
       }
     },
 
-    addNewOrder: (state, action) => {
+    addNewOrder(state, action) {
       const item = action.payload;
       if (!item) {
         state.ordersData = [];
@@ -80,7 +74,7 @@ const productSlice = createSlice({
       );
     },
 
-    removeItemFromCartOnZero: (state, action) => {
+    removeItemFromCartOnZero(state, action) {
       const { menuItemId } = action.payload;
       state.ordersData = state.ordersData.filter(
         (item) => item.menuItemId !== menuItemId
@@ -91,7 +85,7 @@ const productSlice = createSlice({
       );
     },
 
-    updateQuantity: (state, action) => {
+    updateQuantity(state, action) {
       const { menuItemId, quantity } = action.payload;
 
       // update in topPicks if present
@@ -110,7 +104,7 @@ const productSlice = createSlice({
       );
     },
 
-    removeItemFromCart: (state, action) => {
+    removeItemFromCart(state, action) {
       const id = action.payload;
       state.ordersData = state.ordersData.filter(
         (item) => item.menuItemId !== id
@@ -121,19 +115,15 @@ const productSlice = createSlice({
       );
     },
 
-    setOrdersFromLocalStorage: (state, action) => {
+    setOrdersFromLocalStorage(state, action) {
       state.ordersData = action.payload || [];
     },
 
-    orderError: (state, action) => {
-      state.orderError = action.payload;
-    },
-
-    setTopPicks: (state, action) => {
+    setTopPicks(state, action) {
       state.topPicks = action.payload || [];
     },
 
-    setTopPicksEroor: (state, action) => {
+    setTopPicksEroor(state, action) {
       state.topPickError = action.payload;
     },
   },
@@ -151,7 +141,7 @@ export const {
 
 // 1) Fetch products from Supabase: table "product_info"
 export function fetchProductDataThunk() {
-  return async function (dispatch, getState) {
+  return async function (dispatch) {
     try {
       const { data, error: supabaseError } = await supabase
         .from("product_info")
@@ -173,73 +163,13 @@ export function fetchProductDataThunk() {
   };
 }
 
-// 2) Store order into Supabase: table "orders"
-// You need a table like:
-// orders(id uuid default uuid_generate_v4(), user_name text, restaurant_id int,
-// restaurant_name text, order_date timestamptz, items jsonb, total_price numeric, total_quantity int)
-export function fetchOrderDetails(orders) {
-  if (!orders || orders.length === 0) return;
-
-  // build items for DB (you can adjust shape)
-  const orderItems = orders.map((item) => ({
-    menuItemId: item.menuItemId,
-    itemName: item.itemName,
-    price: item.price,
-    quantity: item.quantity,
-  }));
-
-  let total_price = 0;
-  let total_quantity = 0;
-
-  orders.forEach((el) => {
-    total_price += Number(el.price) * Number(el.quantity || 0);
-    total_quantity += Number(el.quantity || 0);
-  });
-
-  const payload = {
-    user_id: "Ravi",
-    order_items: orderItems, // jsonb column in Supabase
-    total_price,
-    quantity: total_quantity,
-  };
-
-  return async function (dispatch, getState) {
-    try {
-      const { data, error } = await supabase
-        .from("order_details")
-        .insert([payload])
-        .select()
-        .single();
-
-      if (error) {
-        console.error("Error inserting order:", error);
-        toast.error("Error placing order. Please try again.");
-        dispatch({ type: "product/orderError", payload: error.message });
-        return;
-      }
-
-      dispatch({ type: "product/fetchOrderDetails", payload: data });
-      toast.success("Order placed successfully!");
-      console.log("Order stored in Supabase:", data);
-    } catch (err) {
-      console.error("Unexpected error placing order:", err);
-      toast.error("Error placing order. Please try again.");
-      dispatch({ type: "product/orderError", payload: err.message });
-    }
-  };
-}
-
-// 3) Compute top picks from productData (no network)
-// Strategy: first item per category
+// 2) Compute top picks from productData (no network)
 export function fetchTopPicks() {
   return async function (dispatch, getState) {
     try {
       const { productData } = getState().product;
 
       if (!productData || productData.length === 0) {
-        // if not loaded yet, you can optionally load:
-        // await dispatch(fetchProductDataThunk());
-        // then read again from state
         dispatch({ type: "product/setTopPicks", payload: [] });
         return;
       }
@@ -252,7 +182,6 @@ export function fetchTopPicks() {
         if (!seenCategories.has(cat)) {
           seenCategories.add(cat);
           topPicsData.push({
-            // mapping to your UI/cart shape:
             menuItemId: item.product_id,
             itemName: item.product_name,
             description: item.product_description,
@@ -273,16 +202,15 @@ export function fetchTopPicks() {
   };
 }
 
-// 4) Add new product directly into Supabase: table "product_info"
+// 3) Add new product directly into Supabase: table "product_info"
 export function addNewProduct(formData) {
-  return async function (dispatch, getState) {
+  return async function (dispatch) {
     const row = {
       product_name: formData.product_name,
       product_description: formData.product_description,
       price: formData.price,
       product_category: formData.product_category,
       image_url: formData.image_url,
-      // optionally include ingredients if you add that column:
       ingredients: formData.ingredients || null,
     };
 

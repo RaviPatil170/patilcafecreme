@@ -94,96 +94,153 @@
   cursor: default;
 }
 
-/* Timeline */
+/* ---------- Vertical timeline (works on all screen sizes) ---------- */
+
 .order-timeline {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 10px 0 12px;
-}
-
-.timeline-step-wrapper {
-  display: flex;
-  align-items: center;
   position: relative;
+  margin: 10px 0 12px;
+  padding-left: 8px;
 }
 
-.timeline-step-dot {
-  width: 22px;
-  height: 22px;
+/* vertical line */
+.order-timeline::before {
+  content: "";
+  position: absolute;
+  left: 16px;
+  top: 6px;
+  bottom: 6px;
+  width: 2px;
+  background: #e3e3e3;
+}
+
+.timeline-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 10px;
+  position: relative;
+  z-index: 1;
+}
+
+.timeline-circle {
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
-  border: 2px solid #ccc;
+  border: 2px solid #ced4da;
   background: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 0.75rem;
   font-weight: 600;
-  color: #999;
+  color: #6c757d;
+  flex-shrink: 0;
 }
 
-.timeline-step-dot-done {
+.timeline-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.timeline-title {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #495057;
+}
+
+.timeline-caption {
+  font-size: 0.78rem;
+  color: #868e96;
+}
+
+/* active / done steps */
+.timeline-step-done .timeline-circle {
   border-color: #198754;
   background: #198754;
   color: #fff;
 }
 
-.timeline-step-label {
-  margin-left: 6px;
-  margin-right: 10px;
-  font-size: 0.8rem;
-  color: #555;
-  white-space: nowrap;
+.timeline-step-done .timeline-title {
+  color: #198754;
+  font-weight: 600;
 }
+/* ---------- Items section (footer of card) ---------- */
 
-.timeline-step-line {
-  width: 40px;
-  height: 2px;
-  background: #ccc;
-  margin-left: 4px;
-  margin-right: 4px;
-}
-
-.timeline-step-line-done {
-  background: #198754;
-}
-
-/* Items list */
 .order-items {
   border-top: 1px solid #eee;
+  margin-top: 12px;
   padding-top: 10px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .order-row {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   font-size: 0.9rem;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .orders-container {
-    padding: 10px;
-  }
+.order-row-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
 
-  .order-card {
-    padding: 10px;
-  }
+.order-item-name {
+  font-weight: 500;
+}
 
-  .order-top {
-    flex-direction: column;
+.order-item-qty {
+  color: #6c757d;
+  font-size: 0.85rem;
+}
+
+.order-item-price {
+  font-weight: 500;
+}
+
+/* mobile adjustments */
+@media (max-width: 480px) {
+  .order-row {
     align-items: flex-start;
   }
 
-  .order-actions {
-    flex-direction: row;
-    justify-content: flex-start;
+  .order-row-left {
+    flex-wrap: wrap;
   }
 
-  .timeline-step-line {
-    width: 30px;
+  .order-item-price {
+    margin-left: 8px;
+  }
+}
+
+/* ---------- Order Summary Footer ---------- */
+
+.order-summary-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 2px solid #f0f0f0;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.summary-left {
+  color: #555;
+}
+
+.summary-right {
+  color: #000;
+}
+
+/* Mobile adjustments */
+@media (max-width: 480px) {
+  .order-summary-footer {
+    font-size: 0.9rem;
+    padding-top: 8px;
+    margin-top: 10px;
   }
 }
