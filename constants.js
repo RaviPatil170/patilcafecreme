@@ -8,4 +8,5 @@ export const CATEGORY = [
   "Cold_Coffee",
   "Sandwich",
   "Pizza",
+  "Shake",
 ];
