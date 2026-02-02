@@ -34,16 +34,13 @@ const NewItemForm = () => {
         const product = data[index];
 
         // 1️⃣ public image path
-        const publicImagePath = `/product_images/fries/${index}.png`
-          ? `/product_images/fries/${index}.png`
-          : `/product_images/fries/${index}.jpeg`;
+        const publicImagePath = `/product_images/burgers/${index}.png`;
+        //const publicImagePath = `/product_images/cadb/Screenshot 2026-02-02 at 3.59.46 PM.png`;
 
         // 2️⃣ convert public image → File
         const imageFile = await getFileFromPublicImage(
           publicImagePath,
           `${product.product_name}.png`
-            ? `${product.product_name}.png`
-            : `${product.product_name}.jpeg`
         );
 
         // 3️⃣ upload using EXISTING logic
@@ -184,21 +181,13 @@ const getFileFromPublicImage = async (imagePath, fileName) => {
 
 const data = [
   {
-    product_name: "Regular Fries",
-    price: 75,
+    product_name: "Veg Cheese Burger",
+    price: 80,
     image_url:
-      "https://images.unsplash.com/photo-1541592106381-b31e9677c0e5?auto=format&fit=crop&w=800&q=80",
-    ingredients: "Potato, Salt, Oil",
-    product_description: "Classic crispy regular fries.",
-    product_category: "Fries",
-  },
-  {
-    product_name: "Peri Peri Fries",
-    price: 90,
-    image_url:
-      "https://images.unsplash.com/photo-1625944525533-473f1a3f88b4?auto=format&fit=crop&w=800&q=80",
-    ingredients: "Potato, Peri peri seasoning, Salt, Oil",
-    product_description: "Spicy peri peri flavored fries.",
-    product_category: "Fries",
+      "https://images.pexels.com/photos/1639562/pexels-photo-1639562.jpeg?auto=compress&cs=tinysrgb&w=800",
+    ingredients: "Veg patty, Cheese slice, Burger bun, Onion, Sauce",
+    product_description:
+      "Vegetarian burger topped with melted cheese and fresh veggies.",
+    product_category: "Burgers",
   },
 ];

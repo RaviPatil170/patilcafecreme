@@ -12,6 +12,7 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 const initialState = {
   currentOrder: null, // last placed order
   preparingOrders: [], // optional: list of orders with status 'preparing'
+  ordersHistory: [], // optional: list of past orders
   loading: false,
   error: null,
 };
@@ -36,6 +37,9 @@ const orderSlice = createSlice({
     setPreparingOrders(state, action) {
       state.preparingOrders = action.payload || [];
     },
+    setOrdersHistory(state, action) {
+      state.ordersHistory = action.payload || [];
+    },
   },
 });
 
@@ -44,6 +48,7 @@ export const {
   placeOrderSuccess,
   placeOrderFailure,
   setPreparingOrders,
+  setOrdersHistory,
 } = orderSlice.actions;
 
 /**
@@ -127,6 +132,27 @@ export function fetchPreparingOrders() {
     } catch (err) {
       console.error("Unexpected error loading preparing orders:", err);
       dispatch(setPreparingOrders([]));
+    }
+  };
+}
+export function fetchOrdersHistory() {
+  return async (dispatch) => {
+    try {
+      const { data, error } = await supabase
+        .from("order_details")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("Error fetching orders history:", error);
+        dispatch(setOrdersHistory([]));
+        return;
+      }
+
+      dispatch(setOrdersHistory(data || []));
+    } catch (err) {
+      console.error("Unexpected error fetching orders history:", err);
+      dispatch(setOrdersHistory([]));
     }
   };
 }

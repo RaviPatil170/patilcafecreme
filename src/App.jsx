@@ -16,6 +16,7 @@ import { useDispatch } from "react-redux";
 import NewProductsPage from "./pages/NewProductsPage";
 import { fetchProductDataThunk } from "./store/productSlice";
 import Orders from "./pages/Orders";
+import OrdersHistory from "./pages/OrdersHistory";
 
 function App() {
   const dispatch = useDispatch();
@@ -35,6 +36,10 @@ function App() {
           ></Route>
           <Route path="/ordercart" element={<Cart></Cart>}></Route>
           <Route path="/orderpreparing" element={<Orders></Orders>}></Route>
+          <Route
+            path="/orders-history"
+            element={<OrdersHistory></OrdersHistory>}
+          ></Route>
 
           <Route path="*" element={<PageNotFound></PageNotFound>}></Route>
         </Routes>

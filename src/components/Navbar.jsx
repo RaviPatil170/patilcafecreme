@@ -78,6 +78,9 @@ const Navbar = () => {
             <Link to="/addnewproducts" onClick={handleClick}>
               Add new Item
             </Link>
+            <Link to="/orders-history" onClick={handleClick}>
+              Orders History
+            </Link>
           </li>
           <li>
             <Link to="/orderpreparing" onClick={handleClick}>
@@ -124,13 +127,25 @@ const Navbar = () => {
         </Link>
 
         <Link
-          to="/addnewproducts"
+          to="/orders-history"
           className={`bottom-nav-item ${
-            location.pathname === "/addnewproducts" ? "active" : ""
+            location.pathname === "/orders-history" ? "active" : ""
           }`}
         >
-          {/* Add Icon */}
           <svg
+            className="order-history-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            <path strokeLinecap="round" d="M4 4h12a2 2 0 0 1 2 2v12" />
+            <path strokeLinecap="round" d="M4 8h10M4 12h10M4 16h6" />
+            <circle cx="18" cy="18" r="3" />
+            <path strokeLinecap="round" d="M18 16v2l1.5 1" />
+          </svg>
+          {/* Add Icon */}
+          {/* <svg
             className="bottom-icon"
             viewBox="0 0 24 24"
             fill="none"
@@ -138,8 +153,8 @@ const Navbar = () => {
             strokeWidth="3"
           >
             <path strokeLinecap="round" d="M12 5v14M5 12h14" />
-          </svg>
-          <span>Add</span>
+          </svg> */}
+          <span>History</span>
         </Link>
 
         {/* CENTER FLOATING CART BUTTON */}
