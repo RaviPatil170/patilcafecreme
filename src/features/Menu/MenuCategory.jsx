@@ -11,6 +11,7 @@ export default function MenuCategory({ products }) {
   const [menuClickedExpand, setMenuClickedExpand] = useState(false);
 
   // 1) Group flat array by product_category
+
   const groupedProducts = products.reduce((acc, item) => {
     const category = item.product_category || "Others";
     if (!acc[category]) acc[category] = [];
@@ -20,6 +21,9 @@ export default function MenuCategory({ products }) {
     });
     return acc;
   }, {});
+  Object.keys(groupedProducts).forEach((category) => {
+    groupedProducts[category].sort((a, b) => a.price - b.price);
+  });
 
   const handleLinkClick = (category) => {
     setIsMenuOpen(false);
