@@ -11,6 +11,22 @@ export const CATEGORY = [
   "Shake",
   "Kuka Exclusive",
 ];
+export const categoryOrder = [
+  "Kuka",
+  "Fries",
+  "Maggie",
+  "Burgers",
+  "Choco Creamy Shakes",
+  "Hot Coffee",
+  "Kuka Exclusive",
+  "Momos",
+  "Nuggets",
+  "Pasta",
+  "pizza",
+  "Sandwich",
+  "Shake",
+  "others",
+];
 // [
 //   {
 //     "product_name": "Plain Maggie",
@@ -325,5 +341,91 @@ export const CATEGORY = [
 //     "ingredients": "Milk, Dark chocolate, Ice cream",
 //     "product_description": "Intense dark chocolate Cad-B creamy shake.",
 //     "product_category": "Choco Creamy Shakes"
+//   }
+// ]
+
+// [
+//   {
+//     "product_name": "Margarita Pizza",
+//     "price": 100,
+//     "image_url": "https://images.unsplash.com/photo-1604068549290-dea0e4a305ca",
+//     "ingredients": "Cheese",
+//     "product_description": "Classic margarita pizza topped with rich cheese.",
+//     "product_category": "pizza"
+//   },
+//   {
+//     "product_name": "American Corn Pizza",
+//     "price": 120,
+//     "image_url": "https://images.unsplash.com/photo-1601924638867-3ec4d58c0f1a",
+//     "ingredients": "Cheese, Sweet Corn, Onion",
+//     "product_description": "Cheesy pizza loaded with sweet corn and onion for a mildly sweet flavor.",
+//     "product_category": "pizza"
+//   },
+//   {
+//     "product_name": "Veg Classic Pizza",
+//     "price": 150,
+//     "image_url": "https://images.unsplash.com/photo-1548365328-8b849e6c7c66",
+//     "ingredients": "Onion, Capsicum, Corn, Cheese",
+//     "product_description": "Classic vegetarian pizza with fresh veggies and cheese.",
+//     "product_category": "pizza"
+//   },
+//   {
+//     "product_name": "Paneer Capsicum Pizza",
+//     "price": 150,
+//     "image_url": "https://images.unsplash.com/photo-1594007654729-407eedc4be65",
+//     "ingredients": "Paneer, Onion, Capsicum, Cheese",
+//     "product_description": "Indian-style pizza topped with soft paneer, capsicum and cheese.",
+//     "product_category": "pizza"
+//   },
+//   {
+//     "product_name": "Mushroom Corn Pizza",
+//     "price": 150,
+//     "image_url": "https://images.unsplash.com/photo-1590947132387-155cc02f3212",
+//     "ingredients": "Mushroom, Corn, Onion, Cheese",
+//     "product_description": "Savory mushroom and corn pizza with a cheesy base.",
+//     "product_category": "pizza"
+//   },
+//   {
+//     "product_name": "Peri-Peri Pizza",
+//     "price": 150,
+//     "image_url": "https://images.unsplash.com/photo-1601924579446-2cda7c6bfc8c",
+//     "ingredients": "Cheese, Onion, Capsicum",
+//     "product_description": "Spicy peri-peri flavored pizza with crunchy veggies and cheese.",
+//     "product_category": "pizza"
+//   },
+//   {
+//     "product_name": "Chocolate Pizza",
+//     "price": 150,
+//     "image_url": "https://images.unsplash.com/photo-1601972599720-36938d4ecd31",
+//     "ingredients": "Chocolate Sauce, Chocolate, Cheese",
+//     "product_description": "Dessert pizza topped with chocolate sauce, melted chocolate and cheese.",
+//     "product_category": "pizza"
+//   }
+// ]
+
+// [
+//   {
+//     "product_name": "Mineral Water Bottle (Large)",
+//     "price": 20,
+//     "image_url": "https://images.unsplash.com/photo-1523362628745-0c100150b504",
+//     "ingredients": "Packaged drinking water",
+//     "product_description": "Large mineral water bottle to keep you hydrated.",
+//     "product_category": "others"
+//   },
+//   {
+//     "product_name": "Mineral Water Bottle (Small)",
+//     "price": 10,
+//     "image_url": "https://images.unsplash.com/photo-1600369671734-1fbcda7b5f57",
+//     "ingredients": "Packaged drinking water",
+//     "product_description": "Small mineral water bottle for quick refreshment.",
+//     "product_category": "others"
+//   },
+//   {
+//     "product_name": "Packing Charge",
+//     "price": 5,
+//     "image_url": "https://images.unsplash.com/photo-1605902711622-cfb43c44367f",
+//     "ingredients": "Packaging material",
+//     "product_description": "Packing charge for takeaway orders.",
+//     "product_category": "others"
 //   }
 // ]
