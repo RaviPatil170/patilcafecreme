@@ -1,33 +1,50 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import "./MenuCategory.css";
 import SingleMenuItem from "./SingleMenuItem";
-import { useLocation } from "react-router-dom";
 import { Link } from "react-scroll";
+import { categoryOrder } from "../../../constants";
 
-export default function MenuCategory({ products }) {
-  const location = useLocation();
-  const sectionRefs = useRef();
+export default function MenuCategory({ products = [] }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [menuClickedExpand, setMenuClickedExpand] = useState(false);
+  const [activeCategory, setActiveCategory] = useState(null);
 
-  // 1) Group flat array by product_category
+  const sortedGroupedArray = useMemo(() => {
+    const grouped = products.reduce((acc, item) => {
+      const category = item.product_category || "others";
 
-  const groupedProducts = products.reduce((acc, item) => {
-    const category = item.product_category || "Others";
-    if (!acc[category]) acc[category] = [];
-    acc[category].push({
-      ...item,
-      quantity: item.quantity ?? 0, // ensure quantity exists
+      if (!acc[category]) acc[category] = [];
+
+      acc[category].push({
+        ...item,
+        quantity: item.quantity ?? 0,
+      });
+
+      return acc;
+    }, {});
+
+    const arr = Object.entries(grouped).map(([category, items]) => ({
+      category,
+      items: items.sort((a, b) => a.price - b.price),
+    }));
+
+    // custom category order
+    arr.sort((a, b) => {
+      const indexA = categoryOrder.indexOf(a.category);
+      const indexB = categoryOrder.indexOf(b.category);
+
+      if (indexA === -1 && indexB === -1) return 0;
+      if (indexA === -1) return 1;
+      if (indexB === -1) return -1;
+
+      return indexA - indexB;
     });
-    return acc;
-  }, {});
-  Object.keys(groupedProducts).forEach((category) => {
-    groupedProducts[category].sort((a, b) => a.price - b.price);
-  });
+
+    return arr;
+  }, [products]);
 
   const handleLinkClick = (category) => {
     setIsMenuOpen(false);
-    setMenuClickedExpand(true);
+    setActiveCategory(category); // expand only this category
   };
 
   function toggleMenu() {
@@ -37,15 +54,15 @@ export default function MenuCategory({ products }) {
   return (
     <div className="menu-container">
       {/* Main sections */}
-      {Object.keys(groupedProducts).map((category) => (
+      {sortedGroupedArray.map(({ category, items }) => (
         <Section
           key={category}
           id={category}
-          menuClickedExpand={menuClickedExpand}
           title={category}
-          count={groupedProducts[category]?.length || 0}
+          count={items.length}
+          activeCategory={activeCategory}
         >
-          {groupedProducts[category]?.map((item, index) => (
+          {items.map((item, index) => (
             <SingleMenuItem key={item.product_id || index} item={item} />
           ))}
         </Section>
@@ -55,20 +72,18 @@ export default function MenuCategory({ products }) {
       {isMenuOpen && (
         <div className="menu-overlay">
           <div className="black-menu-container">
-            {Object.keys(groupedProducts).map((key) => (
+            {sortedGroupedArray.map(({ category, items }) => (
               <Link
-                key={key}
-                to={key}
+                key={category}
+                to={category}
                 spy={true}
                 smooth={true}
                 duration={500}
-                onClick={() => handleLinkClick(key)}
+                onClick={() => handleLinkClick(category)}
               >
                 <div className="menu-single-item">
-                  <span className="heading-singleline">{key}</span>
-                  <span className="count-singleline">
-                    {groupedProducts[key]?.length || 0}
-                  </span>
+                  <span className="heading-singleline">{category}</span>
+                  <span className="count-singleline">{items.length}</span>
                 </div>
               </Link>
             ))}
@@ -83,23 +98,23 @@ export default function MenuCategory({ products }) {
   );
 }
 
-const Section = ({
-  title,
-  count,
-  children,
-  defalutOpen,
-  id,
-  menuClickedExpand,
-}) => {
-  const [isOpen, setIsOpen] = useState(menuClickedExpand); // State for section open/close
+function Section({ title, count, children, id, activeCategory }) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    if (activeCategory === title) {
+      setIsOpen(true);
+    }
+  }, [activeCategory, title]);
 
   return (
     <div className="section" id={id}>
-      <div className="section-header" onClick={() => setIsOpen(!isOpen)}>
+      <div className="section-header" onClick={() => setIsOpen((p) => !p)}>
         <div className="section-header-left">
           <span className="section-title">{title}</span>
           <span className="section-count">({count})</span>
         </div>
+
         <span className={`section-arrow ${isOpen ? "open" : ""}`}>
           {isOpen ? (
             <svg
@@ -134,9 +149,8 @@ const Section = ({
           )}
         </span>
       </div>
-      {defalutOpen || isOpen ? (
-        <div className="section-content">{children}</div>
-      ) : null}
+
+      {isOpen && <div className="section-content">{children}</div>}
     </div>
   );
-};
+}
