@@ -1,7 +1,17 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchOrdersHistory } from "../../store/orderSlice";
+import OrderReceiptSheet from "./OrderReceiptSheet";
+
 import "./OrdersHistoryView.css";
+import { SupabaseClient } from "@supabase/supabase-js";
+import { useNavigate } from "react-router-dom";
+import {
+  preloadCartFromOrder,
+  startEditingOrder,
+} from "../../store/productSlice";
+
+/* ------------------ constants ------------------ */
 
 const FILTER_OPTIONS = [
   { label: "Today", value: "today" },
@@ -10,49 +20,144 @@ const FILTER_OPTIONS = [
   { label: "Last 3 Months", value: "3months" },
 ];
 
+/* ------------------ helpers ------------------ */
+
+const filterOrdersByDate = (orders, filter) => {
+  const now = new Date();
+
+  return orders.filter((order) => {
+    const orderDate = new Date(order.created_at);
+    const diffDays =
+      (now.getTime() - orderDate.getTime()) / (1000 * 60 * 60 * 24);
+
+    switch (filter) {
+      case "today":
+        return diffDays < 1;
+      case "7days":
+        return diffDays <= 7;
+      case "30days":
+        return diffDays <= 30;
+      case "3months":
+        return diffDays <= 90;
+      default:
+        return true;
+    }
+  });
+};
+
+/* ------------------ component ------------------ */
+
 export default function OrdersHistoryView() {
   const dispatch = useDispatch();
   const orders = useSelector((state) => state.order.ordersHistory || []);
 
   const [activeFilter, setActiveFilter] = useState("today");
-  const [selectedOrder, setSelectedOrder] = useState(null); // modal
-
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [editOrder, setEditOrder] = useState(null);
+  const navigate = useNavigate();
   useEffect(() => {
     dispatch(fetchOrdersHistory());
   }, [dispatch]);
 
-  // 🔹 Filter logic
-  const filteredOrders = useMemo(() => {
-    const now = new Date();
+  const filteredOrders = useMemo(
+    () => filterOrdersByDate(orders, activeFilter),
+    [orders, activeFilter]
+  );
 
-    return orders.filter((order) => {
-      const orderDate = new Date(order.created_at);
-      const diffDays =
-        (now.getTime() - orderDate.getTime()) / (1000 * 60 * 60 * 24);
+  const totalSales = useMemo(
+    () =>
+      filteredOrders.reduce(
+        (sum, order) => sum + Number(order.total_price || 0),
+        0
+      ),
+    [filteredOrders]
+  );
 
-      if (activeFilter === "today") return diffDays < 1;
-      if (activeFilter === "7days") return diffDays <= 7;
-      if (activeFilter === "30days") return diffDays <= 30;
-      if (activeFilter === "3months") return diffDays <= 90;
+  /* ------------------ edit helpers ------------------ */
 
-      return true;
+  const updateQty = (index, delta) => {
+    setEditOrder((prev) => {
+      if (!prev) return prev;
+
+      const items = [...(prev.order_items || [])];
+      items[index] = {
+        ...items[index],
+        quantity: Math.max(1, items[index].quantity + delta),
+      };
+
+      return { ...prev, order_items: items };
     });
-  }, [orders, activeFilter]);
+  };
+  //   const addItemToOrder = (product) => {
+  //     setEditOrder((prev) => {
+  //       const existing = prev.order_items.find(
+  //         (i) => i.product_id === product.product_id
+  //       );
 
-  // 🔹 Sales total
-  const totalSales = useMemo(() => {
-    return filteredOrders.reduce(
-      (sum, order) => sum + Number(order.total_price || 0),
+  //       if (existing) {
+  //         return {
+  //           ...prev,
+  //           order_items: prev.order_items.map((i) =>
+  //             i.product_id === product.product_id
+  //               ? { ...i, quantity: i.quantity + 1 }
+  //               : i
+  //           ),
+  //         };
+  //       }
+
+  //       return {
+  //         ...prev,
+  //         order_items: [
+  //           ...prev.order_items,
+  //           {
+  //             product_id: product.product_id,
+  //             product_name: product.product_name,
+  //             price: product.price,
+  //             quantity: 1,
+  //           },
+  //         ],
+  //       };
+  //     });
+  //   };
+  const updateOrderClick = (order) => {
+    dispatch(preloadCartFromOrder(order.order_items));
+    dispatch(startEditingOrder(order.order_id));
+    navigate("/");
+  };
+
+  const handleUpdateOrder = async () => {
+    if (!editOrder) return;
+
+    const total_price = editOrder.order_items.reduce(
+      (sum, item) => sum + item.price * item.quantity,
       0
     );
-  }, [filteredOrders]);
+
+    const quantity = editOrder.order_items.reduce(
+      (sum, item) => sum + item.quantity,
+      0
+    );
+
+    await SupabaseClient.from("order_details")
+      .update({
+        order_items: editOrder.order_items,
+        total_price,
+        quantity,
+      })
+      .eq("order_id", editOrder.order_id);
+
+    setEditOrder(null);
+    dispatch(fetchOrdersHistory());
+  };
+
+  /* ------------------ render ------------------ */
 
   return (
     <div className="orders-history-container">
+      {/* Header */}
       <div className="orders-header">
         <h2>Orders History</h2>
 
-        {/* Combo Filter */}
         <select
           value={activeFilter}
           onChange={(e) => setActiveFilter(e.target.value)}
@@ -75,7 +180,6 @@ export default function OrdersHistoryView() {
         </span>
       </div>
 
-      {/* Table */}
       {/* Orders List */}
       <div className="orders-list">
         {filteredOrders.length === 0 && (
@@ -92,7 +196,7 @@ export default function OrdersHistoryView() {
             </div>
 
             <div className="order-date">
-              {new Date(order.created_at).toLocaleDateString("en-US", {
+              {new Date(order.created_at).toLocaleDateString("en-IN", {
                 day: "numeric",
                 month: "short",
                 hour: "2-digit",
@@ -109,126 +213,40 @@ export default function OrdersHistoryView() {
               </span>
             </div>
 
-            <button
-              className="view-items-link"
-              onClick={() => setSelectedOrder(order)}
-            >
-              View items →
-            </button>
+            <div className="order-actions">
+              <button
+                className="link-btn"
+                onClick={() => setSelectedOrder(order)}
+              >
+                View
+              </button>
+
+              {order.order_status === "preparing" && (
+                <button
+                  className="link-btn edit"
+                  onClick={() => updateOrderClick(order)}
+                >
+                  Update
+                </button>
+              )}
+            </div>
           </div>
         ))}
       </div>
 
-      {/* MODAL */}
-      {selectedOrder && (
-        <div className="sheet-overlay" onClick={() => setSelectedOrder(null)}>
-          <div className="order-sheet" onClick={(e) => e.stopPropagation()}>
-            {/* Drag Handle */}
-            <div className="sheet-handle" />
+      {/* Sheets */}
+      <OrderReceiptSheet
+        order={selectedOrder}
+        onClose={() => setSelectedOrder(null)}
+      />
 
-            {/* Header */}
-            <div className="sheet-actions">
-              <button className="action-btn" onClick={() => window.print()}>
-                <span className="icon">🖨️</span>
-                Print
-              </button>
-
-              <button
-                className="action-btn secondary"
-                onClick={() => setSelectedOrder(null)}
-              >
-                <span className="icon">✕</span>
-                Close
-              </button>
-            </div>
-
-            <div className="sheet-header">
-              <h3>Order #{selectedOrder.order_id}</h3>
-              <span className="sheet-date">
-                {new Date(selectedOrder.created_at).toLocaleDateString(
-                  "en-IN",
-                  {
-                    day: "numeric",
-                    month: "short",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  }
-                )}
-              </span>
-            </div>
-
-            {/* Items */}
-            <div className="receipt">
-              {/* Header */}
-              <div className="receipt-header">
-                <h3>Café Crème</h3>
-                <p className="receipt-sub">Order #{selectedOrder.order_id}</p>
-                <p className="receipt-sub">
-                  {new Date(selectedOrder.created_at).toLocaleString("en-IN", {
-                    day: "numeric",
-                    month: "short",
-                    year: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </p>
-              </div>
-
-              <div className="receipt-divider" />
-
-              {/* Items */}
-              <div className="receipt-items">
-                {selectedOrder.order_items?.map((item, idx) => (
-                  <div key={idx} className="receipt-row">
-                    <div className="receipt-item-name">
-                      {item.product_name}
-                      <span className="receipt-qty">×{item.quantity}</span>
-                    </div>
-                    <div className="receipt-price">
-                      ₹{item.price * item.quantity}
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="receipt-divider" />
-
-              {/* Totals */}
-              <div className="receipt-summary">
-                <div className="receipt-row">
-                  <span>Subtotal</span>
-                  <span>₹{selectedOrder.total_price}</span>
-                </div>
-
-                {/* Optional tax */}
-                {/* <div className="receipt-row">
-    <span>GST (5%)</span>
-    <span>₹{Math.round(selectedOrder.total_price * 0.05)}</span>
-  </div> */}
-
-                <div className="receipt-row receipt-total">
-                  <span>Total</span>
-                  <span>₹{selectedOrder.total_price}</span>
-                </div>
-              </div>
-
-              <div className="receipt-divider" />
-
-              <p className="receipt-footer">
-                Thank you for visiting Café Crème ☕<br />
-                Please come again!
-              </p>
-            </div>
-
-            {/* Footer */}
-            <div className="sheet-footer">
-              <div className="sheet-total">
-                Total: ₹{selectedOrder.total_price}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* <OrderEditSheet
+        order={editOrder}
+        onClose={() => setEditOrder(null)}
+        onUpdateQty={updateQty}
+        onSave={handleUpdateOrder}
+        onAddItem={addItemToOrder}
+      /> */}
     </div>
   );
 }

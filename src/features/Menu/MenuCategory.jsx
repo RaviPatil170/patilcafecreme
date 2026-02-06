@@ -1,7 +1,7 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import "./MenuCategory.css";
 import SingleMenuItem from "./SingleMenuItem";
-import { Link } from "react-scroll";
+import { scroller } from "react-scroll";
 import { categoryOrder } from "../../../constants";
 
 export default function MenuCategory({ products = [] }) {
@@ -11,14 +11,11 @@ export default function MenuCategory({ products = [] }) {
   const sortedGroupedArray = useMemo(() => {
     const grouped = products.reduce((acc, item) => {
       const category = item.product_category || "others";
-
       if (!acc[category]) acc[category] = [];
-
       acc[category].push({
         ...item,
         quantity: item.quantity ?? 0,
       });
-
       return acc;
     }, {});
 
@@ -27,29 +24,33 @@ export default function MenuCategory({ products = [] }) {
       items: items.sort((a, b) => a.price - b.price),
     }));
 
-    // custom category order
+    // Custom category order
     arr.sort((a, b) => {
       const indexA = categoryOrder.indexOf(a.category);
       const indexB = categoryOrder.indexOf(b.category);
-
       if (indexA === -1 && indexB === -1) return 0;
       if (indexA === -1) return 1;
       if (indexB === -1) return -1;
-
       return indexA - indexB;
     });
 
     return arr;
   }, [products]);
 
-  const handleLinkClick = (category) => {
+  const handleMenuItemClick = (category) => {
     setIsMenuOpen(false);
-    setActiveCategory(category); // expand only this category
+    setActiveCategory(category);
+
+    scroller.scrollTo(category, {
+      smooth: true,
+      duration: 500,
+      offset: -80, // adjust if header is fixed
+    });
   };
 
-  function toggleMenu() {
+  const toggleMenu = () => {
     setIsMenuOpen((prev) => !prev);
-  }
+  };
 
   return (
     <div className="menu-container">
@@ -60,7 +61,10 @@ export default function MenuCategory({ products = [] }) {
           id={category}
           title={category}
           count={items.length}
-          activeCategory={activeCategory}
+          isOpen={activeCategory === category}
+          onToggle={() =>
+            setActiveCategory((prev) => (prev === category ? null : category))
+          }
         >
           {items.map((item, index) => (
             <SingleMenuItem key={item.product_id || index} item={item} />
@@ -73,19 +77,16 @@ export default function MenuCategory({ products = [] }) {
         <div className="menu-overlay">
           <div className="black-menu-container">
             {sortedGroupedArray.map(({ category, items }) => (
-              <Link
+              <div
                 key={category}
-                to={category}
-                spy={true}
-                smooth={true}
-                duration={500}
-                onClick={() => handleLinkClick(category)}
+                className={`menu-single-item ${
+                  activeCategory === category ? "active" : ""
+                }`}
+                onClick={() => handleMenuItemClick(category)}
               >
-                <div className="menu-single-item">
-                  <span className="heading-singleline">{category}</span>
-                  <span className="count-singleline">{items.length}</span>
-                </div>
-              </Link>
+                <span className="heading-singleline">{category}</span>
+                <span className="count-singleline">{items.length}</span>
+              </div>
             ))}
           </div>
         </div>
@@ -98,18 +99,20 @@ export default function MenuCategory({ products = [] }) {
   );
 }
 
-function Section({ title, count, children, id, activeCategory }) {
-  const [isOpen, setIsOpen] = useState(false);
+function Section({ title, count, children, id, isOpen, onToggle }) {
+  const handleHeaderClick = () => {
+    onToggle();
 
-  useEffect(() => {
-    if (activeCategory === title) {
-      setIsOpen(true);
-    }
-  }, [activeCategory, title]);
+    scroller.scrollTo(id, {
+      smooth: true,
+      duration: 400,
+      offset: -80, // adjust if header is fixed
+    });
+  };
 
   return (
     <div className="section" id={id}>
-      <div className="section-header" onClick={() => setIsOpen((p) => !p)}>
+      <div className="section-header" onClick={handleHeaderClick}>
         <div className="section-header-left">
           <span className="section-title">{title}</span>
           <span className="section-count">({count})</span>

@@ -1,0 +1,114 @@
+/* Overlay */
+.sheet-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(2px);
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}
+
+/* Sheet */
+.order-sheet {
+  width: 100%;
+  max-width: 420px;
+  background: #fff;
+  border-radius: 18px 18px 0 0;
+  padding: 16px;
+
+  /* IMPORTANT */
+  max-height: calc(100vh - 80px); /* space for bottom nav */
+  overflow: hidden;
+
+  display: flex;
+  flex-direction: column;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Action bar */
+.sheet-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 2;
+  padding-bottom: 8px;
+}
+
+.action-btn {
+  border: none;
+  background: #f3f4f6;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.action-btn.secondary {
+  color: #b91c1c;
+}
+
+/* Receipt */
+.receipt {
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 13px;
+}
+
+.receipt-header {
+  text-align: center;
+}
+
+.receipt-header h3 {
+  margin: 6px 0;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.receipt-sub {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.receipt-divider {
+  border-top: 1px dashed #d1d5db;
+  margin: 12px 0;
+}
+
+/* Rows */
+.receipt-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+}
+
+.receipt-total {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+/* Footer */
+.receipt-footer {
+  text-align: center;
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 10px;
+}
+.sheet-content {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 16px;
+}

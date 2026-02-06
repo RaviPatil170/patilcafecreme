@@ -58,9 +58,11 @@ export const {
 export function fetchOrderDetails(orders) {
   if (!orders || orders.length === 0) return () => {};
 
-  return async (dispatch) => {
+  return async (dispatch, getState) => {
     try {
       dispatch(placeOrderStart());
+
+      const { editingOrderId } = getState().product;
 
       const orderItems = orders.map((item) => ({
         product_id: item.menuItemId,
@@ -77,12 +79,44 @@ export function fetchOrderDetails(orders) {
         total_quantity += Number(el.quantity || 0);
       });
 
+      // 👉 UPDATE EXISTING ORDER
+      if (editingOrderId) {
+        const { data, error } = await supabase
+          .from("order_details")
+          .update({
+            order_items: orderItems,
+            total_price,
+            quantity: total_quantity,
+          })
+          .eq("order_id", editingOrderId)
+          .select()
+          .single();
+
+        if (error) {
+          console.error("Error updating order:", error);
+          toast.error("Error updating order. Please try again.");
+          dispatch(placeOrderFailure(error.message));
+          return;
+        }
+
+        dispatch(placeOrderSuccess(data));
+        toast.success("Order updated successfully!");
+        console.log("Order updated in Supabase:", data);
+
+        // reset edit mode + cart
+        dispatch({ type: "product/stopEditingOrder" });
+        dispatch({ type: "product/clearCart" });
+
+        return;
+      }
+
+      // 👉 CREATE NEW ORDER
       const payload = {
         user_id: "Ravi",
-        order_items: orderItems, // json column
+        order_items: orderItems,
         total_price,
         quantity: total_quantity,
-        order_status: "preparing", // default status
+        order_status: "preparing",
       };
 
       const { data, error } = await supabase
@@ -102,8 +136,8 @@ export function fetchOrderDetails(orders) {
       toast.success("Order placed successfully!");
       console.log("Order stored in Supabase:", data);
     } catch (err) {
-      console.error("Unexpected error placing order:", err);
-      toast.error("Error placing order. Please try again.");
+      console.error("Unexpected error placing/updating order:", err);
+      toast.error("Error placing/updating order. Please try again.");
       dispatch(placeOrderFailure(err.message));
     }
   };

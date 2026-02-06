@@ -29,6 +29,7 @@ const initialState = {
   responseForAddedProduct: null,
   topPicks: [],
   topPickError: "",
+  editingOrderId: null,
 };
 
 const productSlice = createSlice({
@@ -126,6 +127,30 @@ const productSlice = createSlice({
     setTopPicksEroor(state, action) {
       state.topPickError = action.payload;
     },
+    preloadCartFromOrder(state, action) {
+      const orderItems = action.payload || [];
+      state.ordersData = orderItems.map((item) => ({
+        menuItemId: item.product_id,
+        itemName: item.product_name,
+        price: item.price,
+        quantity: item.quantity,
+      }));
+      window.localStorage.setItem(
+        "ordersInCart",
+        JSON.stringify(state.ordersData)
+      );
+    },
+    clearCart(state) {
+      state.ordersData = [];
+    },
+    startEditingOrder(state, action) {
+      state.editingOrderId = action.payload;
+    },
+    stopEditingOrder(state) {
+      state.editingOrderId = null;
+      state.ordersData = [];
+      window.localStorage.setItem("ordersInCart", JSON.stringify([]));
+    },
   },
 });
 
@@ -135,6 +160,10 @@ export const {
   removeItemFromCart,
   setOrdersFromLocalStorage,
   removeItemFromCartOnZero,
+  preloadCartFromOrder,
+  clearCart,
+  startEditingOrder,
+  stopEditingOrder,
 } = productSlice.actions;
 
 // --------------- Thunks (Supabase only) ---------------
@@ -152,7 +181,7 @@ export function fetchProductDataThunk() {
         dispatch({ type: "product/fetchProductData", payload: [] });
         toast.error("Error loading products");
       } else {
-        console.log("Fetched products:", data);
+        //console.log("Fetched products:", data);
         dispatch({ type: "product/fetchProductData", payload: data });
       }
     } catch (err) {
@@ -193,7 +222,6 @@ export function fetchTopPicks() {
         }
       });
 
-      console.log("Top picks derived from Supabase products:", topPicsData);
       dispatch({ type: "product/setTopPicks", payload: topPicsData });
     } catch (e) {
       console.log("error while computing top picks", e);

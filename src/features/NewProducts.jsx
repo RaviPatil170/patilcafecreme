@@ -5,7 +5,6 @@ import "./NewProducts.css";
 
 export default function NewProducts() {
   const products = useSelector((state) => state.product.productData);
-  console.log("New Products:", products);
   return (
     <div className="menu-container-for-middle">
       <MenuCategory products={products}></MenuCategory>

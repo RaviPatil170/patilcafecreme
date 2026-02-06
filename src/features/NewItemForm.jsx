@@ -34,7 +34,7 @@ const NewItemForm = () => {
         const product = data[index];
 
         // 1️⃣ public image path
-        const publicImagePath = `/product_images/burgers/${index}.png`;
+        const publicImagePath = `/product_images/kuka/${index}.png`;
         //const publicImagePath = `/product_images/cadb/Screenshot 2026-02-02 at 3.59.46 PM.png`;
 
         // 2️⃣ convert public image → File
@@ -181,13 +181,12 @@ const getFileFromPublicImage = async (imagePath, fileName) => {
 
 const data = [
   {
-    product_name: "Veg Cheese Burger",
-    price: 80,
-    image_url:
-      "https://images.pexels.com/photos/1639562/pexels-photo-1639562.jpeg?auto=compress&cs=tinysrgb&w=800",
-    ingredients: "Veg patty, Cheese slice, Burger bun, Onion, Sauce",
+    product_name: "Irish Kuka with Crush",
+    price: 65,
+    image_url: "https://images.unsplash.com/photo-1605478904545-2d58a4c1f5e0",
+    ingredients: "Irish flavor syrup, milk, chocolate crush, ice",
     product_description:
-      "Vegetarian burger topped with melted cheese and fresh veggies.",
-    product_category: "Burgers",
+      "Refreshing Irish flavored kuka topped with chocolate crush for extra texture.",
+    product_category: "kuka",
   },
 ];
