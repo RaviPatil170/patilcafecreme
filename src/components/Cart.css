@@ -296,3 +296,61 @@
     max-height: 220px;
   }
 }
+
+.customer-input {
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+.customer-input label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 4px;
+}
+
+.customer-input input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 14px;
+  border-radius: 999px; /* pill shape like cart buttons */
+  border: 1px solid #e5e7eb;
+  font-size: 14px;
+  background: #f9fafb; /* subtle soft background */
+  outline: none;
+}
+.cart-popup {
+  width: 100%;
+  max-width: 420px; /* prevents narrow modal on desktop */
+  box-sizing: border-box;
+}
+.qty-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.qty-btn:hover:not(:disabled) {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 50%;
+}
+.remove-btn {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+}
+
+.remove-btn:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+.subtotal {
+  letter-spacing: 0.2px;
+}
+
+.subtotal-amount {
+  font-size: 16px;
+}
+.customer-input input::placeholder {
+  color: #9ca3af;
+}

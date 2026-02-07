@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   addNewOrder,
@@ -14,7 +14,7 @@ import "./Cart.css";
 export default function Cartbasket({ orders, closeModal }) {
   const dispatch = useDispatch();
   const editingOrderId = useSelector((state) => state.product.editingOrderId);
-
+  const [customerName, setCustomerName] = useState("");
   function clearCartEverywhere() {
     dispatch(clearCart());
     window.localStorage.setItem("ordersInCart", JSON.stringify([]));
@@ -22,9 +22,11 @@ export default function Cartbasket({ orders, closeModal }) {
 
   async function placeOrder() {
     if (!orders || orders.length === 0) return;
+    const finalName =
+      customerName.trim() !== "" ? customerName.trim() : "Cafe Crème";
 
     // Send to Supabase (create or update handled inside thunk)
-    await dispatch(fetchOrderDetails(orders));
+    dispatch(fetchOrderDetails(orders, finalName));
 
     // Close modal immediately (UI responsiveness)
     closeModal();
@@ -75,7 +77,15 @@ export default function Cartbasket({ orders, closeModal }) {
       <h2 className="cart-title">
         {editingOrderId ? `Editing Order #${editingOrderId}` : "Your Cart"}
       </h2>
-
+      <div className="customer-input">
+        <label>Customer Name</label>
+        <input
+          type="text"
+          placeholder="Enter customer name"
+          value={customerName}
+          onChange={(e) => setCustomerName(e.target.value)}
+        />
+      </div>
       <div className="cart-items">
         {orders.map((item) => (
           <div className="cart-item" key={item.menuItemId}>

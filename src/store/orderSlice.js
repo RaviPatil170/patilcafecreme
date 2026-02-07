@@ -55,7 +55,7 @@ export const {
  * Place order into Supabase "order_details" table.
  * This is your old fetchOrderDetails thunk, moved here.
  */
-export function fetchOrderDetails(orders) {
+export function fetchOrderDetails(orders, customerName) {
   if (!orders || orders.length === 0) return () => {};
 
   return async (dispatch, getState) => {
@@ -78,6 +78,10 @@ export function fetchOrderDetails(orders) {
         total_price += Number(el.price) * Number(el.quantity || 0);
         total_quantity += Number(el.quantity || 0);
       });
+      const finalCustomerName =
+        customerName && customerName.trim()
+          ? customerName.trim()
+          : "Cafe Crème";
 
       // 👉 UPDATE EXISTING ORDER
       if (editingOrderId) {
@@ -87,6 +91,7 @@ export function fetchOrderDetails(orders) {
             order_items: orderItems,
             total_price,
             quantity: total_quantity,
+            user_id: finalCustomerName,
           })
           .eq("order_id", editingOrderId)
           .select()
@@ -112,7 +117,7 @@ export function fetchOrderDetails(orders) {
 
       // 👉 CREATE NEW ORDER
       const payload = {
-        user_id: "Ravi",
+        user_id: finalCustomerName,
         order_items: orderItems,
         total_price,
         quantity: total_quantity,

@@ -22,6 +22,10 @@ export default function OrderReceiptSheet({ order, onClose }) {
               <h3>Café Crème</h3>
               <p className="receipt-sub">Order #{order.order_id}</p>
               <p className="receipt-sub">
+                Customer: {order.user_name || "Cafe Crème"}
+              </p>
+
+              <p className="receipt-sub">
                 {new Date(order.created_at).toLocaleString("en-IN", {
                   day: "numeric",
                   month: "short",
