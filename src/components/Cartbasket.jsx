@@ -22,19 +22,26 @@ export default function Cartbasket({ orders, closeModal }) {
 
   async function placeOrder() {
     if (!orders || orders.length === 0) return;
+
     const finalName =
       customerName.trim() !== "" ? customerName.trim() : "Cafe Crème";
 
-    // Send to Supabase (create or update handled inside thunk)
-    dispatch(fetchOrderDetails(orders, finalName));
+    const success = await dispatch(fetchOrderDetails([...orders], finalName));
 
-    // Close modal immediately (UI responsiveness)
-    closeModal();
+    if (success) {
+      dispatch(clearCart());
+      dispatch(stopEditingOrder());
+      window.localStorage.removeItem("ordersInCart");
+
+      setCustomerName("");
+      closeModal();
+    }
   }
 
   function cancelOrder() {
-    clearCartEverywhere();
+    dispatch(clearCart());
     dispatch(stopEditingOrder());
+    window.localStorage.removeItem("ordersInCart");
     closeModal();
   }
 

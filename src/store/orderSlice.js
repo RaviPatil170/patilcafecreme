@@ -56,7 +56,7 @@ export const {
  * This is your old fetchOrderDetails thunk, moved here.
  */
 export function fetchOrderDetails(orders, customerName) {
-  if (!orders || orders.length === 0) return () => {};
+  if (!orders || orders.length === 0) return () => false;
 
   return async (dispatch, getState) => {
     try {
@@ -71,13 +71,16 @@ export function fetchOrderDetails(orders, customerName) {
         price: item.price,
       }));
 
-      let total_price = 0;
-      let total_quantity = 0;
+      const total_price = orders.reduce(
+        (sum, el) => sum + Number(el.price) * Number(el.quantity || 0),
+        0
+      );
 
-      orders.forEach((el) => {
-        total_price += Number(el.price) * Number(el.quantity || 0);
-        total_quantity += Number(el.quantity || 0);
-      });
+      const total_quantity = orders.reduce(
+        (sum, el) => sum + Number(el.quantity || 0),
+        0
+      );
+
       const finalCustomerName =
         customerName && customerName.trim()
           ? customerName.trim()
@@ -97,22 +100,12 @@ export function fetchOrderDetails(orders, customerName) {
           .select()
           .single();
 
-        if (error) {
-          console.error("Error updating order:", error);
-          toast.error("Error updating order. Please try again.");
-          dispatch(placeOrderFailure(error.message));
-          return;
-        }
+        if (error) throw error;
 
         dispatch(placeOrderSuccess(data));
         toast.success("Order updated successfully!");
-        console.log("Order updated in Supabase:", data);
 
-        // reset edit mode + cart
-        dispatch({ type: "product/stopEditingOrder" });
-        dispatch({ type: "product/clearCart" });
-
-        return;
+        return true;
       }
 
       // 👉 CREATE NEW ORDER
@@ -130,20 +123,17 @@ export function fetchOrderDetails(orders, customerName) {
         .select()
         .single();
 
-      if (error) {
-        console.error("Error inserting order:", error);
-        toast.error("Error placing order. Please try again.");
-        dispatch(placeOrderFailure(error.message));
-        return;
-      }
+      if (error) throw error;
 
       dispatch(placeOrderSuccess(data));
       toast.success("Order placed successfully!");
-      console.log("Order stored in Supabase:", data);
+
+      return true;
     } catch (err) {
-      console.error("Unexpected error placing/updating order:", err);
-      toast.error("Error placing/updating order. Please try again.");
+      console.error("Order error:", err);
+      toast.error("Error placing/updating order.");
       dispatch(placeOrderFailure(err.message));
+      return false;
     }
   };
 }
