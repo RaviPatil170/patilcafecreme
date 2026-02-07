@@ -1,36 +1,38 @@
 import React from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   addNewOrder,
   removeItemFromCart,
   removeItemFromCartOnZero,
   updateQuantity,
+  clearCart,
+  stopEditingOrder,
 } from "../store/productSlice";
 import { fetchOrderDetails } from "../store/orderSlice";
 import "./Cart.css";
 
 export default function Cartbasket({ orders, closeModal }) {
   const dispatch = useDispatch();
+  const editingOrderId = useSelector((state) => state.product.editingOrderId);
 
   function clearCartEverywhere() {
-    // clear redux cart (addNewOrder with falsy payload clears in your slice)
-    dispatch(addNewOrder(null));
-    // clear localStorage correctly
+    dispatch(clearCart());
     window.localStorage.setItem("ordersInCart", JSON.stringify([]));
   }
 
   async function placeOrder() {
     if (!orders || orders.length === 0) return;
 
-    // send to Supabase (orderSlice thunk)
-    dispatch(fetchOrderDetails(orders));
-    // immediately clear cart in UI
-    clearCartEverywhere();
+    // Send to Supabase (create or update handled inside thunk)
+    await dispatch(fetchOrderDetails(orders));
+
+    // Close modal immediately (UI responsiveness)
     closeModal();
   }
 
   function cancelOrder() {
     clearCartEverywhere();
+    dispatch(stopEditingOrder());
     closeModal();
   }
 
@@ -42,12 +44,7 @@ export default function Cartbasket({ orders, closeModal }) {
       return;
     }
 
-    dispatch(
-      updateQuantity({
-        menuItemId,
-        quantity: q,
-      })
-    );
+    dispatch(updateQuantity({ menuItemId, quantity: q }));
   };
 
   const handleRemoveItem = (menuItemId) => {
@@ -75,7 +72,9 @@ export default function Cartbasket({ orders, closeModal }) {
 
   return (
     <div className="cart-popup">
-      <h2 className="cart-title">Your Cart</h2>
+      <h2 className="cart-title">
+        {editingOrderId ? `Editing Order #${editingOrderId}` : "Your Cart"}
+      </h2>
 
       <div className="cart-items">
         {orders.map((item) => (
@@ -129,22 +128,9 @@ export default function Cartbasket({ orders, closeModal }) {
               <button
                 className="remove-btn"
                 onClick={() => handleRemoveItem(item.menuItemId)}
+                aria-label="Remove item"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  width="18"
-                  height="18"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <path
-                    d="M3 6h18M9 6V4h6v2m-9 0h12v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6h3zm3 4v6m4-6v6"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+                🗑️
               </button>
             </div>
           </div>
@@ -165,8 +151,9 @@ export default function Cartbasket({ orders, closeModal }) {
             onClick={placeOrder}
             disabled={orders.length === 0}
           >
-            Place Order
+            {editingOrderId ? "Update Order" : "Place Order"}
           </button>
+
           <button className="cancel-order-btn" onClick={cancelOrder}>
             Cancel
           </button>
