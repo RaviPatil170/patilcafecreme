@@ -1,5 +1,5 @@
 import React from "react";
-import "./orderReceiptSheet.css";
+import "./OrderReceiptSheet.css";
 export default function OrderReceiptSheet({ order, onClose }) {
   if (!order) return null;
   return (
