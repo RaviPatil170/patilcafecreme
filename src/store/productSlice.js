@@ -225,7 +225,7 @@ export function fetchTopPicks() {
       dispatch({ type: "product/setTopPicks", payload: topPicsData });
     } catch (e) {
       console.log("error while computing top picks", e);
-      dispatch({ type: "product/setTopPicksEroor", payload: e.message });
+      dispatch({ type: "product/setTopPicksError", payload: e.message });
     }
   };
 }
@@ -261,6 +261,58 @@ export function addNewProduct(formData) {
     } catch (err) {
       console.error("Unexpected error adding product:", err);
       toast.error("Unexpected error adding product");
+    }
+  };
+}
+// store/productThunks.js (or inside productSlice file)
+
+export function fetchTopPicksBySales() {
+  return async function (dispatch, getState) {
+    try {
+      const { productData } = getState().product;
+      const { ordersHistory } = getState().order;
+
+      if (!productData?.length || !ordersHistory?.length) {
+        dispatch({ type: "product/setTopPicks", payload: [] });
+        return;
+      }
+
+      // 1️⃣ Aggregate total sold per product_id
+      const salesMap = {};
+
+      ordersHistory.forEach((order) => {
+        (order.order_items || []).forEach((item) => {
+          const id = item.product_id;
+          salesMap[id] = (salesMap[id] || 0) + Number(item.quantity || 0);
+        });
+      });
+
+      // 2️⃣ Attach sales to productData
+      const topPicks = productData
+        .map((product) => ({
+          ...product,
+          totalSold: salesMap[product.product_id] || 0,
+        }))
+        .sort((a, b) => b.totalSold - a.totalSold) // most sold first
+        .slice(0, 7)
+        .map((item) => ({
+          menuItemId: item.product_id,
+          itemName: item.product_name,
+          description: item.product_description,
+          price: item.price,
+          image_url: item.image_url,
+          product_category: item.product_category,
+          quantity: 0,
+          totalSold: item.totalSold, // optional: useful for UI/debug
+        }));
+
+      dispatch({ type: "product/setTopPicks", payload: topPicks });
+    } catch (e) {
+      console.error("error while computing top picks", e);
+      dispatch({
+        type: "product/setTopPicksError",
+        payload: e.message,
+      });
     }
   };
 }

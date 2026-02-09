@@ -77,7 +77,15 @@ export default function SingleMenuItem({ item }) {
       </div>
 
       <div className="item-right-section">
-        <img src={item.image_url} alt={item.product_name} loading="lazy" />
+        <img
+          src={item.image_url}
+          alt={item.product_name}
+          loading="lazy"
+          width="160"
+          height="120"
+          onLoad={(e) => e.target.classList.add("loaded")}
+          className="product-image skeleton "
+        />
 
         {!quantityForButton?.quantity ? (
           <button className="button-add" onClick={() => handleProductAdd(item)}>
