@@ -2,12 +2,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 import { createClient } from "@supabase/supabase-js";
-
-const supabaseUrl = "https://ahbqwdvotjqyjjicsvdf.supabase.co";
-const supabaseAnonKey =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFoYnF3ZHZvdGpxeWpqaWNzdmRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUzNTAzMzUsImV4cCI6MjA4MDkyNjMzNX0.mgZsIi-9IWymRDN6i65F7Przbt4wxIWPatXYz6tjk0I";
-
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+import { supabase } from "../supabaseClient";
+import { act } from "react";
 
 const loadOrdersFromStorage = () => {
   try {
@@ -25,11 +21,11 @@ const initialState = {
   ordersData: loadOrdersFromStorage(),
   loading: false,
   error: null,
-
   responseForAddedProduct: null,
   topPicks: [],
   topPickError: "",
   editingOrderId: null,
+  topPicksLoading: false,
 };
 
 const productSlice = createSlice({
@@ -121,7 +117,7 @@ const productSlice = createSlice({
     },
 
     setTopPicks(state, action) {
-      state.topPicks = action.payload || [];
+      state.topPicks = action.payload;
     },
 
     setTopPicksEroor(state, action) {
@@ -151,6 +147,9 @@ const productSlice = createSlice({
       state.ordersData = [];
       window.localStorage.setItem("ordersInCart", JSON.stringify([]));
     },
+    setTopPicksLoading(state, action) {
+      state.topPicksLoading = action.payload;
+    },
   },
 });
 
@@ -164,6 +163,7 @@ export const {
   clearCart,
   startEditingOrder,
   stopEditingOrder,
+  setTopPicksLoading,
 } = productSlice.actions;
 
 // --------------- Thunks (Supabase only) ---------------
@@ -181,8 +181,9 @@ export function fetchProductDataThunk() {
         dispatch({ type: "product/fetchProductData", payload: [] });
         toast.error("Error loading products");
       } else {
-        //console.log("Fetched products:", data);
+        console.log("Fetched products:", data);
         dispatch({ type: "product/fetchProductData", payload: data });
+        return data;
       }
     } catch (err) {
       console.error("Unexpected error fetching products:", err);
@@ -195,38 +196,24 @@ export function fetchProductDataThunk() {
 // 2) Compute top picks from productData (no network)
 export function fetchTopPicks() {
   return async function (dispatch, getState) {
-    try {
-      const { productData } = getState().product;
+    return async function (dispatch) {
+      try {
+        dispatch({ type: "product/setTopPicksLoading", payload: true });
+        const { data, error: supabaseError } = await supabase
+          .from("product_info")
+          .select("*");
 
-      if (!productData || productData.length === 0) {
-        dispatch({ type: "product/setTopPicks", payload: [] });
-        return;
-      }
-
-      const seenCategories = new Set();
-      const topPicsData = [];
-
-      productData.forEach((item) => {
-        const cat = item.product_category || "Others";
-        if (!seenCategories.has(cat)) {
-          seenCategories.add(cat);
-          topPicsData.push({
-            menuItemId: item.product_id,
-            itemName: item.product_name,
-            description: item.product_description,
-            price: item.price,
-            image_url: item.image_url,
-            product_category: item.product_category,
-            quantity: 0,
-          });
+        if (supabaseError) {
+          console.error("Error fetching products:", supabaseError);
+        } else {
+          console.log("top pickssss", data);
+          dispatch({ type: "product/setTopPicks", payload: data.slice(0, 7) });
+          return data.slice(0, 7);
         }
-      });
-
-      dispatch({ type: "product/setTopPicks", payload: topPicsData });
-    } catch (e) {
-      console.log("error while computing top picks", e);
-      dispatch({ type: "product/setTopPicksError", payload: e.message });
-    }
+      } catch (err) {
+        console.error("Unexpected error fetching products:", err);
+      }
+    };
   };
 }
 
@@ -269,31 +256,44 @@ export function addNewProduct(formData) {
 export function fetchTopPicksBySales() {
   return async function (dispatch, getState) {
     try {
-      const { productData } = getState().product;
-      const { ordersHistory } = getState().order;
+      const state = getState();
+      const { productData } = state.product;
+      const { ordersHistory } = state.order;
 
-      if (!productData?.length || !ordersHistory?.length) {
-        dispatch({ type: "product/setTopPicks", payload: [] });
-        return;
-      }
+      if (!productData?.length || !ordersHistory?.length) return;
 
-      // 1️⃣ Aggregate total sold per product_id
       const salesMap = {};
 
       ordersHistory.forEach((order) => {
-        (order.order_items || []).forEach((item) => {
+        let items = order.order_items;
+
+        // ✅ Normalize order_items into array
+        if (typeof items === "string") {
+          try {
+            items = JSON.parse(items);
+          } catch {
+            items = [];
+          }
+        }
+
+        if (!Array.isArray(items)) {
+          items = [];
+        }
+
+        items.forEach((item) => {
           const id = item.product_id;
+          if (!id) return;
+
           salesMap[id] = (salesMap[id] || 0) + Number(item.quantity || 0);
         });
       });
 
-      // 2️⃣ Attach sales to productData
       const topPicks = productData
         .map((product) => ({
           ...product,
           totalSold: salesMap[product.product_id] || 0,
         }))
-        .sort((a, b) => b.totalSold - a.totalSold) // most sold first
+        .sort((a, b) => b.totalSold - a.totalSold)
         .slice(0, 7)
         .map((item) => ({
           menuItemId: item.product_id,
@@ -303,12 +303,12 @@ export function fetchTopPicksBySales() {
           image_url: item.image_url,
           product_category: item.product_category,
           quantity: 0,
-          totalSold: item.totalSold, // optional: useful for UI/debug
+          totalSold: item.totalSold,
         }));
-
+      console.log("Computed top picks by sales:", topPicks);
       dispatch({ type: "product/setTopPicks", payload: topPicks });
     } catch (e) {
-      console.error("error while computing top picks", e);
+      console.error("fetchTopPicksBySales failed:", e);
       dispatch({
         type: "product/setTopPicksError",
         payload: e.message,
