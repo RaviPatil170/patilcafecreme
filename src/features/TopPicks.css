@@ -1,17 +1,22 @@
 .toppicks-outer-container {
-  width: 900px;
+  width: 100%;
+  max-width: 900px;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
   align-items: flex-start;
-  overflow: hidden;
+  overflow: hidden; /* ✅ block any outer scrolling */
 }
 .toppicks-container {
+  width: 100%;
   display: flex;
   gap: 12px;
-  overflow-x: auto;
+  overflow-x: auto; /* ✅ ONLY horizontal scroll */
+  overflow-y: hidden;
   scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
   padding: 8px 12px 12px;
+
+  scrollbar-width: none; /* Firefox */
 }
 .item-container {
   display: flex;
@@ -28,10 +33,11 @@
   background-position: center;
 }
 .toppicks-header-section {
+  width: 100%;
+  max-width: 900px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 900px;
   padding: 10px;
   box-sizing: border-box;
 }

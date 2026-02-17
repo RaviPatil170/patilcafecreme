@@ -13,6 +13,7 @@ export default function TopPicks({ products }) {
   const ordersHistory = useSelector((state) => state.order.ordersHistory);
 
   const containerRef = useRef(null);
+  const [atStart, setAtStart] = useState(true);
   const [atEnd, setAtEnd] = useState(false);
   const scrollAmount = 300;
 
@@ -34,16 +35,35 @@ export default function TopPicks({ products }) {
     }
   }, [dispatch, ordersHistory?.length, productData?.length]);
 
-  const handleNext = () => {
+  useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
-    el.scrollTo({ left: el.scrollLeft + scrollAmount, behavior: "smooth" });
+
+    const onScroll = () => {
+      const { scrollLeft, scrollWidth, clientWidth } = el;
+
+      setAtStart(scrollLeft <= 5);
+      setAtEnd(scrollLeft + clientWidth >= scrollWidth - 5);
+    };
+
+    onScroll(); // initial check
+    el.addEventListener("scroll", onScroll);
+
+    return () => el.removeEventListener("scroll", onScroll);
+  }, [topPicks.length]);
+
+  const handleNext = () => {
+    const el = containerRef.current;
+    if (!el || atEnd) return;
+
+    el.scrollBy({ left: 300, behavior: "smooth" });
   };
 
   const handlePrev = () => {
     const el = containerRef.current;
-    if (!el) return;
-    el.scrollTo({ left: el.scrollLeft - scrollAmount, behavior: "smooth" });
+    if (!el || atStart) return;
+
+    el.scrollBy({ left: -300, behavior: "smooth" });
   };
 
   return (
@@ -51,8 +71,12 @@ export default function TopPicks({ products }) {
       <div className="toppicks-header-section">
         <h3>Top Picks</h3>
         <div className="toppick-nav-buttons">
-          <button onClick={handlePrev}>‹</button>
-          <button onClick={handleNext}>›</button>
+          <button onClick={handlePrev} disabled={atStart}>
+            ‹
+          </button>
+          <button onClick={handleNext} disabled={atEnd}>
+            ›
+          </button>
         </div>
       </div>
 
