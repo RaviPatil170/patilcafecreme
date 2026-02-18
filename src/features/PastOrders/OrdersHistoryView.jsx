@@ -22,23 +22,47 @@ const FILTER_OPTIONS = [
 
 /* ------------------ helpers ------------------ */
 
+const isTodayInIST = (date) => {
+  const now = new Date();
+
+  const istFormatter = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Asia/Kolkata",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+
+  return istFormatter.format(date) === istFormatter.format(now);
+};
+
 const filterOrdersByDate = (orders, filter) => {
   const now = new Date();
 
   return orders.filter((order) => {
     const orderDate = new Date(order.created_at);
-    const diffDays =
-      (now.getTime() - orderDate.getTime()) / (1000 * 60 * 60 * 24);
 
     switch (filter) {
       case "today":
-        return diffDays < 1;
-      case "7days":
-        return diffDays <= 7;
-      case "30days":
-        return diffDays <= 30;
-      case "3months":
-        return diffDays <= 90;
+        return isTodayInIST(orderDate);
+
+      case "7days": {
+        const sevenDaysAgo = new Date(now);
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        return orderDate >= sevenDaysAgo;
+      }
+
+      case "30days": {
+        const thirtyDaysAgo = new Date(now);
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        return orderDate >= thirtyDaysAgo;
+      }
+
+      case "3months": {
+        const threeMonthsAgo = new Date(now);
+        threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+        return orderDate >= threeMonthsAgo;
+      }
+
       default:
         return true;
     }
@@ -88,37 +112,7 @@ export default function OrdersHistoryView() {
       return { ...prev, order_items: items };
     });
   };
-  //   const addItemToOrder = (product) => {
-  //     setEditOrder((prev) => {
-  //       const existing = prev.order_items.find(
-  //         (i) => i.product_id === product.product_id
-  //       );
 
-  //       if (existing) {
-  //         return {
-  //           ...prev,
-  //           order_items: prev.order_items.map((i) =>
-  //             i.product_id === product.product_id
-  //               ? { ...i, quantity: i.quantity + 1 }
-  //               : i
-  //           ),
-  //         };
-  //       }
-
-  //       return {
-  //         ...prev,
-  //         order_items: [
-  //           ...prev.order_items,
-  //           {
-  //             product_id: product.product_id,
-  //             product_name: product.product_name,
-  //             price: product.price,
-  //             quantity: 1,
-  //           },
-  //         ],
-  //       };
-  //     });
-  //   };
   const updateOrderClick = (order) => {
     dispatch(preloadCartFromOrder(order.order_items));
     dispatch(startEditingOrder(order.order_id));
