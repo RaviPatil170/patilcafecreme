@@ -22,10 +22,10 @@ export default function ProgressiveImage({
       <img
         src={src}
         alt={alt}
-        loading="lazy"
         decoding="async"
         className={`pi-img pi-full ${loaded ? "visible" : ""}`}
         onLoad={() => setLoaded(true)}
+        fetchpriority="high"
       />
     </div>
   );

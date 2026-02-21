@@ -2,12 +2,13 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 import { createClient } from "@supabase/supabase-js";
+import { supabase } from "../supabaseClient";
 
-const supabaseUrl = "https://ahbqwdvotjqyjjicsvdf.supabase.co";
-const supabaseAnonKey =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFoYnF3ZHZvdGpxeWpqaWNzdmRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUzNTAzMzUsImV4cCI6MjA4MDkyNjMzNX0.mgZsIi-9IWymRDN6i65F7Przbt4wxIWPatXYz6tjk0I";
+// const supabaseUrl = "https://ahbqwdvotjqyjjicsvdf.supabase.co";
+// const supabaseAnonKey =
+//   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFoYnF3ZHZvdGpxeWpqaWNzdmRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUzNTAzMzUsImV4cCI6MjA4MDkyNjMzNX0.mgZsIi-9IWymRDN6i65F7Przbt4wxIWPatXYz6tjk0I";
 
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 const initialState = {
   currentOrder: null, // last placed order
@@ -15,6 +16,7 @@ const initialState = {
   ordersHistory: [], // optional: list of past orders
   loading: false,
   error: null,
+  isOrderPlacing: false,
 };
 
 const orderSlice = createSlice({
@@ -40,6 +42,9 @@ const orderSlice = createSlice({
     setOrdersHistory(state, action) {
       state.ordersHistory = action.payload || [];
     },
+    setPlacingOrderInProgress(state, action) {
+      state.isOrderPlacing = action.payload;
+    },
   },
 });
 
@@ -49,6 +54,7 @@ export const {
   placeOrderFailure,
   setPreparingOrders,
   setOrdersHistory,
+  setPlacingOrderInProgress,
 } = orderSlice.actions;
 
 /**
@@ -61,7 +67,7 @@ export function fetchOrderDetails(orders, customerName) {
   return async (dispatch, getState) => {
     try {
       dispatch(placeOrderStart());
-
+      dispatch(setPlacingOrderInProgress(true));
       const { editingOrderId } = getState().product;
 
       const orderItems = orders.map((item) => ({
@@ -104,7 +110,7 @@ export function fetchOrderDetails(orders, customerName) {
 
         dispatch(placeOrderSuccess(data));
         toast.success("Order updated successfully!");
-
+        dispatch(setPlacingOrderInProgress(false));
         return true;
       }
 
@@ -127,12 +133,13 @@ export function fetchOrderDetails(orders, customerName) {
 
       dispatch(placeOrderSuccess(data));
       toast.success("Order placed successfully!");
-
+      dispatch(setPlacingOrderInProgress(false));
       return true;
     } catch (err) {
       console.error("Order error:", err);
       toast.error("Error placing/updating order.");
       dispatch(placeOrderFailure(err.message));
+      dispatch(setPlacingOrderInProgress(false));
       return false;
     }
   };

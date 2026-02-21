@@ -14,6 +14,7 @@ import "./Cart.css";
 export default function Cartbasket({ orders, closeModal }) {
   const dispatch = useDispatch();
   const editingOrderId = useSelector((state) => state.product.editingOrderId);
+  const isPlacingOrder = useSelector((state) => state.order.isOrderPlacing);
   const [customerName, setCustomerName] = useState("");
   function clearCartEverywhere() {
     dispatch(clearCart());
@@ -26,7 +27,7 @@ export default function Cartbasket({ orders, closeModal }) {
     const finalName =
       customerName.trim() !== "" ? customerName.trim() : "Cafe Crème";
 
-    const success = await dispatch(fetchOrderDetails([...orders], finalName));
+    const success = dispatch(fetchOrderDetails([...orders], finalName));
 
     if (success) {
       dispatch(clearCart());
@@ -166,7 +167,7 @@ export default function Cartbasket({ orders, closeModal }) {
           <button
             className="place-order-btn"
             onClick={placeOrder}
-            disabled={orders.length === 0}
+            disabled={orders.length === 0 || isPlacingOrder}
           >
             {editingOrderId ? "Update Order" : "Place Order"}
           </button>

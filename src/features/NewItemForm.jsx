@@ -30,63 +30,66 @@ const NewItemForm = () => {
 
   const handleSubmit = async (e) => {
     try {
-      for (let index = 0; index < data.length; index++) {
-        const product = data[index];
+      //   for (let index = 0; index < data.length; index++) {
+      //     const product = data[index];
 
-        // 1️⃣ public image path
-        const publicImagePath = `/product_images/kuka/${index}.png`;
-        //const publicImagePath = `/product_images/cadb/Screenshot 2026-02-02 at 3.59.46 PM.png`;
+      //     // 1️⃣ public image path
+      //     const publicImagePath = `/product_images/kuka/${index}.png`;
+      //     //const publicImagePath = `/product_images/cadb/Screenshot 2026-02-02 at 3.59.46 PM.png`;
 
-        // 2️⃣ convert public image → File
-        const imageFile = await getFileFromPublicImage(
-          publicImagePath,
-          `${product.product_name}.png`
-        );
+      //     // 2️⃣ convert public image → File
+      //     const imageFile = await getFileFromPublicImage(
+      //       publicImagePath,
+      //       `${product.product_name}.png`
+      //     );
 
-        // 3️⃣ upload using EXISTING logic
-        const image_url = await uploadProductImage(imageFile);
+      //     // 3️⃣ upload using EXISTING logic
+      //     const image_url = await uploadProductImage(imageFile);
 
-        // 4️⃣ save product
-        dispatch(
-          addNewProduct({
-            product_name: product.product_name,
-            price: product.price,
-            ingredients: product.ingredients,
-            product_description: product.product_description,
-            product_category: product.product_category,
-            image_url,
-          })
-        );
+      //     // 4️⃣ save product
+      //     dispatch(
+      //       addNewProduct({
+      //         product_name: product.product_name,
+      //         price: product.price,
+      //         ingredients: product.ingredients,
+      //         product_description: product.product_description,
+      //         product_category: product.product_category,
+      //         image_url,
+      //       })
+      //     );
+      //   }
+      // } catch (error) {
+      //   console.error("Error adding products:", error);
+      //   toast.error("Error adding products. Check console for details.");
+      // }
+
+      e.preventDefault();
+      let image_url = "";
+      if (formData.image_file) {
+        image_url = await uploadProductImage(formData.image_file);
       }
-    } catch (error) {
-      console.error("Error adding products:", error);
-      toast.error("Error adding products. Check console for details.");
+      dispatch(
+        addNewProduct({
+          product_name: formData.product_name,
+          price: formData.price,
+          ingredients: formData.ingredients,
+          product_description: formData.product_description,
+          product_category: formData.product_category,
+          image_url: image_url, // ✅ only URL goes to Redux
+        })
+      );
+
+      setFormData({
+        product_name: "",
+        price: "",
+        ingredients: "",
+        product_description: "",
+        image_file: null,
+        product_category: "",
+      });
+    } catch (e) {
+      console.log(e);
     }
-
-    // e.preventDefault();
-    // let image_url = "";
-    // if (formData.image_file) {
-    //   image_url = await uploadProductImage(formData.image_file);
-    // }
-    // dispatch(
-    //   addNewProduct({
-    //     product_name: formData.product_name,
-    //     price: formData.price,
-    //     ingredients: formData.ingredients,
-    //     product_description: formData.product_description,
-    //     product_category: formData.product_category,
-    //     image_url: image_url, // ✅ only URL goes to Redux
-    //   })
-    // );
-
-    // setFormData({
-    //   product_name: "",
-    //   price: "",
-    //   ingredients: "",
-    //   product_description: "",
-    //   image_file: null,
-    //   product_category: "",
-    // });
   };
 
   return (
