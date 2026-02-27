@@ -18,6 +18,7 @@ import { fetchProductDataThunk } from "./store/productSlice";
 import Orders from "./pages/Orders";
 import OrdersHistory from "./pages/OrdersHistory";
 
+//this file is the main entry point of our React application. It sets up the routing and initializes the fetching of product data when the app loads.
 function App() {
   const dispatch = useDispatch();
   useEffect(() => {
