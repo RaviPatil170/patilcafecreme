@@ -5,3 +5,5 @@ const supabaseAnonKey =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFoYnF3ZHZvdGpxeWpqaWNzdmRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUzNTAzMzUsImV4cCI6MjA4MDkyNjMzNX0.mgZsIi-9IWymRDN6i65F7Przbt4wxIWPatXYz6tjk0I";
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+console.log("SUPABASE URL:", import.meta.env.VITE_SUPABASE_URL);
+console.log("SUPABASE KEY:", import.meta.env.VITE_SUPABASE_ANON_KEY);
